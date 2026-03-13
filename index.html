@@ -13,6 +13,16 @@
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
+body{
+  line-height:1.6;
+  font-size:16px;
+}
+h1{font-size:56px;line-height:1.1;letter-spacing:-1.5px}
+h2{font-size:40px;line-height:1.2}
+h3{font-size:22px}
+p{font-size:16px;line-height:1.7}
+
+
 /* ── THEME ── */
 :root{--bg:#ffffff;--bg2:#f9fafb;--bg3:#f3f4f6;--text:#111827;--text2:#4b5563;--text3:#9ca3af;--text4:#d1d5db;--border:#e5e7eb;--border2:#d1d5db;--green:#00e5a0;--green2:#00b87f;--green3:#00ffb0;--dark:#0a0e1a;--dark2:#0d1220}
 [data-theme="dark"]{--bg:#0a0e1a;--bg2:#0d1220;--bg3:rgba(255,255,255,0.03);--text:#ffffff;--text2:rgba(255,255,255,0.65);--text3:rgba(255,255,255,0.4);--text4:rgba(255,255,255,0.2);--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1)}
@@ -32,9 +42,14 @@ nav{
   background:transparent;
   transition:all .5s;
 }
-nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+nav.scrolled{
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(148,163,184,.55);
+  box-shadow:0 10px 25px rgba(15,23,42,.06);
+}
 [data-theme="dark"] nav.scrolled{background:rgba(10,14,26,.9)}
-.nav-inner{max-width:1280px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-inner{max-width:1280px;margin:0 auto;padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
 
 /* LOGO */
 .logo-link{display:flex;align-items:center;gap:12px;text-decoration:none}
@@ -43,7 +58,13 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .logo-ring-inner{position:absolute;inset:0}
 .logo-phone{position:relative;z-index:10;color:#0a0e1a}
 .logo-text-wrap{display:flex;flex-direction:column;line-height:1}
-.logo-ring-txt{font-size:10px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--text3)}
+.logo-ring-txt{
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:var(--text2);
+}
 .logo-voo-txt{font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-top:-2px}
 .logo-voo-txt span{color:#00e5a0}
 
@@ -66,7 +87,7 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .hero{
   position:relative;min-height:100vh;
   background:var(--bg);
-  overflow:hidden;padding-top:96px;padding-bottom:64px;
+  overflow:hidden;padding-top:112px;padding-bottom:80px;
   display:flex;align-items:center;
   transition:background .3s;
 }
@@ -78,11 +99,26 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .hero-grid{position:absolute;inset:0;opacity:.025;background-image:linear-gradient(rgba(0,0,0,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.15) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
 [data-theme="dark"] .hero-grid{opacity:.03}
 
-.hero-inner{position:relative;max-width:1280px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:48px;align-items:center}
-@media(min-width:1024px){.hero-inner{flex-direction:row;gap:64px}}
+.hero-inner{
+  position:relative;
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 32px;
+  display:flex;
+  flex-direction:column;
+  gap:56px;
+  align-items:center;
+}
+@media(min-width:1024px){
+  .hero-inner{
+    flex-direction:row;
+    gap:140px;
+    align-items:flex-start;
+  }
+}
 
 /* LEFT */
-.hero-left{flex:1;text-align:center}
+.hero-left{flex:1;text-align:center;padding-top:8px}
 @media(min-width:1024px){.hero-left{text-align:left}}
 
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);border-radius:100px;padding:6px 16px;margin-bottom:32px}
@@ -90,11 +126,29 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .hero-badge-txt{font-size:12px;font-weight:600;color:#00b87f;letter-spacing:.05em}
 [data-theme="dark"] .hero-badge-txt{color:#00e5a0}
 
-.hero-h1{font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px;color:var(--text)}
+.hero-h1{
+  font-size:clamp(40px,6vw,72px);
+  font-weight:800;
+  line-height:1.08;
+  letter-spacing:-2px;
+  margin-bottom:28px;
+  color:var(--text);
+}
 .hero-h1 .green{color:#00e5a0}
-.hero-h1 .dim{font-size:.6em;font-weight:600;color:var(--text3)}
+.hero-h1 .dim{
+  font-size:.7em;
+  font-weight:600;
+  color:var(--text2);
+  line-height:1.15;
+}
 
-.hero-p{font-size:16px;color:var(--text2);max-width:480px;margin:0 auto 24px;line-height:1.65}
+.hero-p{
+  font-size:18px;
+  color:var(--text2);
+  max-width:540px;
+  margin:0 auto 24px;
+  line-height:1.75;
+}
 @media(min-width:1024px){.hero-p{margin-left:0}}
 
 .hero-from{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:24px}
@@ -105,7 +159,22 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 @media(min-width:640px){.hero-ctas{flex-direction:row}}
 @media(min-width:1024px){.hero-ctas{justify-content:flex-start}}
 
-.btn-hero{display:flex;align-items:center;gap:8px;background:#00e5a0;color:#0a0e1a;font-weight:700;padding:16px 32px;border-radius:16px;font-size:14px;border:none;cursor:pointer;transition:all .3s;box-shadow:0 20px 40px rgba(0,229,160,.2)}
+.btn-hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:#00e5a0;
+  color:#0a0e1a;
+  font-weight:700;
+  padding:18px 32px;
+  border-radius:16px;
+  font-size:16px;
+  border:none;
+  cursor:pointer;
+  transition:all .3s;
+  box-shadow:0 20px 40px rgba(0,229,160,.2);
+}
 .btn-hero:hover{background:#00ffb0;box-shadow:0 20px 40px rgba(0,229,160,.3)}
 .hero-free{font-size:14px;color:var(--text3);font-weight:500}
 .hero-free b{color:#00b87f}
@@ -131,9 +200,9 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
   border:1px solid rgba(229,231,235,.8);
   border-radius:28px;
   box-shadow:0 25px 50px rgba(107,114,128,.4),0 12px 24px rgba(0,0,0,.08);
-  width:400px;
+  width:420px;
   overflow:hidden;
-  transition:background .3s,border-color .3s;
+  transition:background .3s,border-color .3s,transform .2s;
 }
 [data-theme="dark"] .dialer-card{background:#0f1623;border-color:rgba(255,255,255,.08);box-shadow:0 25px 50px rgba(0,0,0,.5)}
 
@@ -173,7 +242,7 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .d-tab svg{width:12px;height:12px}
 
 /* number input row */
-.d-num-row{margin:0 20px 12px;position:relative}
+.d-num-row{margin:0 20px 14px;position:relative}
 .d-num-field-wrap{
   display:flex;align-items:center;
   background:var(--bg2);border:1px solid var(--border);border-radius:16px;
@@ -182,38 +251,317 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 [data-theme="dark"] .d-num-field-wrap{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
 .d-num-field-wrap:focus-within{border-color:rgba(0,229,160,.5)}
 
-.d-cc-btn{display:flex;align-items:center;gap:6px;padding-right:12px;border-right:1px solid var(--border);flex-shrink:0;background:none;border-left:none;border-top:none;border-bottom:none;cursor:pointer}
+.d-cc-wrap{position:relative;display:flex;align-items:center}
+.d-cc-btn{
+  display:flex;align-items:center;gap:6px;
+  padding-right:12px;
+  border-right:1px solid var(--border);
+  flex-shrink:0;
+  background:none;
+  border-left:none;border-top:none;border-bottom:none;
+  cursor:pointer;
+}
 [data-theme="dark"] .d-cc-btn{border-right-color:rgba(255,255,255,.1)}
 .d-cc-btn .flag{font-size:20px}
 .d-cc-btn .code{font-size:14px;font-weight:500;color:var(--text2)}
 .d-cc-btn svg{width:12px;height:12px;color:var(--text3)}
 
-.d-num-input{flex:1;padding-left:12px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;min-width:0}
+.d-cc-dropdown{
+  position:absolute;
+  top:110%;
+  left:0;
+  z-index:30;
+  background:#ffffff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  min-width:190px;
+  padding:4px 0;
+  display:none;
+}
+[data-theme="dark"] .d-cc-dropdown{
+  background:#1a2535;
+  border-color:rgba(255,255,255,.1);
+}
+.d-cc-dropdown.open{display:block}
+.d-cc-opt{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:13px;
+  color:var(--text);
+  transition:background .15s;
+}
+.d-cc-opt .flag{font-size:18px}
+.d-cc-opt small{color:var(--text3);margin-left:auto}
+.d-cc-opt:hover{background:var(--bg2)}
+[data-theme="dark"] .d-cc-opt:hover{background:rgba(255,255,255,.05)}
+
+.d-num-input{
+  flex:1;
+  padding-left:12px;
+  border:none;
+  background:transparent;
+  font-family:'DM Sans',sans-serif;
+  font-size:18px;
+  font-weight:600;
+  color:var(--text);
+  outline:none;
+  min-width:0;
+}
 .d-num-input::placeholder{color:var(--text4)}
 [data-theme="dark"] .d-num-input{color:#ffffff}
 [data-theme="dark"] .d-num-input::placeholder{color:rgba(255,255,255,.2)}
 
 /* caller row */
-.d-caller-row{margin:0 20px 8px;display:flex;align-items:center;gap:12px}
-.d-caller-label{font-size:12px;color:var(--text3);white-space:nowrap}
-.d-caller-sel{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;cursor:pointer;transition:border-color .2s}
+.d-caller-row{margin:0 20px 10px;display:flex;align-items:center;gap:12px}
+.d-caller-label{
+  font-size:12px;
+  color:var(--text2);
+  font-weight:500;
+  white-space:nowrap;
+}
+.d-caller-wrap{
+  position:relative;
+  flex-shrink:0;
+}
+.d-caller-sel{
+  min-width:150px;
+  max-width:190px;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:6px 10px;
+  cursor:pointer;transition:border-color .2s;
+}
 [data-theme="dark"] .d-caller-sel{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
 .d-caller-sel:hover{border-color:rgba(0,229,160,.4)}
 .d-caller-sel span{font-size:12px}
 .d-caller-sel .sel-txt{font-size:12px;font-weight:500;color:var(--text2)}
 .d-caller-sel svg{width:12px;height:12px;color:var(--text3)}
 
+.d-caller-dropdown{
+  position:absolute;
+  top:110%;
+  left:0;
+  z-index:25;
+  background:#ffffff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  padding:8px 0 10px;
+  min-width:320px;
+  display:none;
+}
+[data-theme="dark"] .d-caller-dropdown{
+  background:#1a2535;
+  border-color:rgba(255,255,255,.1);
+}
+.d-caller-dropdown.open{display:block}
+.d-caller-section-label{
+  padding:4px 12px 6px;
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--text2);
+}
+.d-caller-opt{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  font-size:13px;
+  color:var(--text);
+  cursor:pointer;
+  transition:background .15s;
+  white-space:nowrap;
+}
+.d-caller-opt-icon{
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:var(--bg2);
+  color:var(--text2);
+  flex-shrink:0;
+}
+.d-caller-opt small{color:var(--text3);margin-left:auto;font-size:11px}
+.d-caller-pill{
+  margin-left:auto;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:700;
+  background:rgba(16,185,129,.12);
+  color:#059669;
+}
+[data-theme="dark"] .d-caller-pill{
+  background:rgba(16,185,129,.18);
+  color:#6ee7b7;
+}
+.d-caller-opt:hover{background:var(--bg2)}
+[data-theme="dark"] .d-caller-opt:hover{background:rgba(255,255,255,.05)}
+
+/* generic centered modals */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:80;
+}
+.modal-backdrop.show{display:flex}
+.modal-card{
+  width:100%;
+  max-width:420px;
+  background:#ffffff;
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(15,23,42,.35);
+  padding:20px 22px 18px;
+}
+[data-theme="dark"] .modal-card{
+  background:#0f172a;
+  box-shadow:0 20px 60px rgba(0,0,0,.75);
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.modal-title{
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+}
+.modal-close-btn{
+  border:none;
+  background:none;
+  cursor:pointer;
+  color:var(--text3);
+  font-size:16px;
+}
+.modal-body{
+  font-size:13px;
+  color:var(--text2);
+}
+.modal-field-label{
+  font-size:12px;
+  color:var(--text3);
+  margin-bottom:4px;
+}
+.modal-input{
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg2);
+  color:var(--text);
+  font-size:13px;
+  outline:none;
+}
+.modal-input::placeholder{color:var(--text4)}
+.modal-note{
+  margin-top:10px;
+  padding:10px 11px;
+  border-radius:8px;
+  background:#ecfeff;
+  border:1px solid #bae6fd;
+  font-size:11px;
+  color:#0369a1;
+}
+[data-theme="dark"] .modal-note{
+  background:rgba(15,118,110,.15);
+  border-color:rgba(56,189,248,.5);
+  color:#e0f2fe;
+}
+.modal-note-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.modal-note-title span{
+  width:16px;
+  height:16px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:#0ea5e9;
+  color:white;
+  font-size:10px;
+}
+.modal-list{
+  margin-top:14px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+.modal-list-row{
+  padding:8px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  background:var(--bg);
+}
+.modal-list-row:nth-child(2){
+  border-top:1px solid var(--border);
+}
+.modal-list-num{
+  font-size:13px;
+  color:var(--text);
+}
+.modal-list-sub{
+  font-size:11px;
+  color:#059669;
+}
+.modal-footer{
+  margin-top:16px;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+.modal-btn{
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  border:1px solid var(--border);
+  background:var(--bg2);
+  color:var(--text2);
+  cursor:pointer;
+}
+.modal-btn-primary{
+  border:none;
+  background:#00e5a0;
+  color:#0a0e1a;
+}
+.modal-btn-primary:hover{background:#00ffb0}
+
 /* add contact */
-.d-add-contact{display:flex;justify-content:center;margin-bottom:8px}
-.d-add-contact button{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);border:1px dashed var(--border);border-radius:100px;padding:6px 16px;background:none;cursor:pointer;transition:all .2s}
-.d-add-contact button:hover{color:#00b87f;border-color:rgba(0,229,160,.4)}
+.d-add-contact{display:flex;justify-content:center;margin-bottom:10px;margin-top:4px}
+.d-add-contact button{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;
+  color:var(--text2);
+  border:1px dashed var(--border);border-radius:100px;
+  padding:6px 16px;
+  background:none;cursor:pointer;transition:all .2s;
+}
+.d-add-contact button:hover{color:#00b87f;border-color:rgba(0,229,160,.5)}
 [data-theme="dark"] .d-add-contact button:hover{color:#00e5a0}
 
 /* KEYPAD — ROUND KEYS */
 .d-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 0;padding:4px 24px 20px}
 .d-key{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:68px;height:68px;border-radius:50%;margin:0 auto;
+  width:72px;height:72px;border-radius:50%;margin:0 auto;
   background:var(--bg2);border:1px solid var(--border);
   cursor:pointer;user-select:none;transition:all .1s;
   box-shadow:0 1px 3px rgba(0,0,0,.06);
@@ -223,11 +571,29 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 [data-theme="dark"] .d-key:hover{background:rgba(255,255,255,.08)}
 .d-key:active{transform:scale(.92);box-shadow:none}
 .dk-num{font-size:22px;font-weight:600;color:var(--text);line-height:1}
-.dk-sub{font-size:9px;font-weight:500;letter-spacing:.18em;color:var(--text3);margin-top:2px;text-transform:uppercase}
+.dk-sub{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.17em;
+  color:var(--text2);
+  margin-top:3px;
+  text-transform:uppercase;
+}
 
 /* bottom call row */
 .d-call-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 24px 24px}
-.d-side-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--bg2);border:1px solid var(--border);cursor:pointer;transition:all .2s;color:var(--text3)}
+.d-side-btn{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  cursor:pointer;transition:all .2s;
+  color:var(--text3);
+  font-size:11px;
+  font-weight:600;
+}
 [data-theme="dark"] .d-side-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
 .d-side-btn:hover{background:var(--bg3);color:var(--text2)}
 [data-theme="dark"] .d-side-btn:hover{background:rgba(255,255,255,.08)}
@@ -252,7 +618,12 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 [data-theme="dark"] .d-big-call-btn.ready svg,[data-theme="dark"] .d-big-call-btn.calling svg{color:#0a0e1a}
 
 /* rate hint */
-.d-rate-hint{padding-bottom:16px;text-align:center;font-size:11px;color:var(--text3)}
+.d-rate-hint{
+  padding-bottom:16px;
+  text-align:center;
+  font-size:12px;
+  color:var(--text2);
+}
 .d-rate-hint span{color:#00b87f;font-weight:600}
 [data-theme="dark"] .d-rate-hint span{color:#00e5a0}
 
@@ -307,19 +678,19 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .ov-end:hover{background:#dc2626;transform:scale(1.06)}
 
 /* ── SECTIONS ── */
-.section-hiw{background:var(--bg2);padding:96px 0;transition:background .3s}
+.section-hiw{background:var(--bg2);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-hiw{background:#0d1220}
-.section-feat{background:var(--bg);padding:96px 0;transition:background .3s}
+.section-feat{background:var(--bg);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-feat{background:#0a0e1a}
-.section-price{background:var(--bg2);padding:96px 0;transition:background .3s}
+.section-price{background:var(--bg2);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-price{background:#0d1220}
-.section-rates{background:var(--bg);padding:96px 0;transition:background .3s}
+.section-rates{background:var(--bg);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-rates{background:#0a0e1a}
-.section-testi{background:var(--bg2);padding:96px 0;transition:background .3s}
+.section-testi{background:var(--bg2);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-testi{background:#0d1220}
-.section-faq{background:var(--bg);padding:96px 0;transition:background .3s}
+.section-faq{background:var(--bg);padding:120px 0;transition:background .3s}
 [data-theme="dark"] .section-faq{background:#0a0e1a}
-.section-cta{background:var(--bg2);padding:96px 0;position:relative;overflow:hidden;transition:background .3s}
+.section-cta{background:var(--bg2);padding:120px 0;position:relative;overflow:hidden;transition:background .3s}
 [data-theme="dark"] .section-cta{background:#0d1220}
 
 .max-w-5{max-width:1024px;margin:0 auto;padding:0 24px}
@@ -349,6 +720,11 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .hiw-card:hover .hiw-icon{transform:scale(1.1)}
 .hiw-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
 .hiw-desc{font-size:14px;color:var(--text3);line-height:1.65}
+.hiw-desc{
+  font-size:15px;
+  color:var(--text2);
+  line-height:1.7;
+}
 
 /* FEATURES */
 .feat-grid{display:grid;gap:20px}
@@ -356,7 +732,7 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 @media(min-width:1024px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
 .feat-card{
   background:var(--bg2);border:1px solid var(--border);border-radius:16px;
-  padding:24px;transition:all .5s;
+  padding:28px;transition:all .5s;
 }
 [data-theme="dark"] .feat-card{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.05)}
 .feat-card:hover{border-color:rgba(0,229,160,.25);box-shadow:0 4px 16px rgba(0,0,0,.08)}
@@ -373,8 +749,11 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 @media(min-width:1024px){.price-grid{grid-template-columns:repeat(4,1fr)}}
 .price-card{
   position:relative;background:#ffffff;border:1px solid var(--border);
-  border-radius:16px;padding:24px;text-align:center;
+  border-radius:16px;padding:32px 28px;text-align:center;
   cursor:pointer;transition:all .5s;box-shadow:0 1px 3px rgba(0,0,0,.06);
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
 }
 [data-theme="dark"] .price-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
 .price-card:hover{transform:scale(1.02)}
@@ -390,12 +769,14 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .price-amt{font-size:32px;font-weight:900;color:var(--text);margin-bottom:4px}
 .price-bonus{font-size:12px;font-weight:600;color:#00b87f}
 [data-theme="dark"] .price-bonus{color:#00e5a0}
-.price-sub{font-size:14px;color:var(--text3);margin-top:8px;margin-bottom:20px}
+.price-sub{font-size:14px;color:var(--text3);margin-top:8px;margin-bottom:20px;min-height:20px}
 .price-btn{
   width:100%;padding:10px;border-radius:12px;font-size:14px;font-weight:600;
   cursor:pointer;transition:all .3s;
   background:var(--bg3);color:var(--text2);border:1px solid var(--border);
 }
+[data-theme="dark"] .price-card.hot .price-sub{color:rgba(255,255,255,.8)}
+.price-card .price-btn{margin-top:auto}
 [data-theme="dark"] .price-btn{background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.1)}
 .price-btn:hover{background:var(--border);color:var(--text)}
 [data-theme="dark"] .price-btn:hover{background:rgba(255,255,255,.1)}
@@ -446,6 +827,12 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 .rate-val{font-size:32px;font-weight:900;color:var(--text)}
 .rate-val small{font-size:14px;font-weight:400;color:var(--text3)}
 .rates-note{text-align:center;font-size:12px;color:var(--text4);margin-top:20px}
+.rates-note{
+  text-align:center;
+  font-size:12px;
+  color:var(--text3);
+  margin-top:20px;
+}
 
 /* TESTIMONIALS */
 .testi-grid{display:grid;gap:24px}
@@ -481,13 +868,13 @@ nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-b
 [data-theme="dark"] .cta-phone-box{color:#00e5a0}
 .cta-title{font-size:clamp(28px,4.5vw,48px);font-weight:800;color:var(--text);margin-bottom:16px;letter-spacing:-1.5px;line-height:1.1}
 .cta-title .g{color:#00e5a0}
-.cta-sub{font-size:16px;color:var(--text3);max-width:400px;margin:0 auto 32px;line-height:1.65}
+.cta-sub{font-size:16px;color:var(--text3);max-width:420px;margin:0 auto 32px;line-height:1.65}
 .btn-cta-big{display:inline-flex;align-items:center;gap:8px;background:#00e5a0;color:#0a0e1a;font-weight:700;font-size:16px;padding:16px 40px;border-radius:16px;border:none;cursor:pointer;transition:all .3s;box-shadow:0 20px 40px rgba(0,229,160,.2)}
 .btn-cta-big:hover{background:#00ffb0;box-shadow:0 20px 40px rgba(0,229,160,.3)}
 .cta-note{font-size:12px;color:var(--text4);margin-top:16px}
 
 /* FOOTER */
-footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;transition:background .3s,border-color .3s}
+footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;transition:background .3s,border-color .3s}
 [data-theme="dark"] footer{background:#080b14;border-color:rgba(255,255,255,.04)}
 .foot-inner{max-width:1152px;margin:0 auto;padding:0 24px}
 .foot-grid{display:grid;gap:40px;margin-bottom:48px}
@@ -505,7 +892,9 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
 .foot-copy{font-size:12px;color:var(--text4)}
 .foot-links{display:flex;gap:24px}
 .foot-links a{font-size:12px;color:var(--text4);text-decoration:none;transition:color .3s}
-.foot-links a:hover{color:var(--text3)}
+.foot-copy{font-size:12px;color:var(--text3)}
+.foot-links a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .3s}
+.foot-links a:hover{color:var(--text2)}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#ffffff;border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.12);z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(60px);opacity:0;max-width:280px;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
@@ -609,7 +998,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
       <div class="hero-ctas">
         <button class="btn-hero" onclick="showToast('Creating your account…','s')">
           <span>Call anywhere in</span>
-          <span id="flagDisplay" style="display:inline-flex;align-items:center;gap:4px;min-width:3.5rem">🇺🇸 US</span>
+          <span id="flagDisplay" style="display:inline-flex;align-items:center;gap:4px;">United States</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
         <span class="hero-free">✨ Your first call is <b>FREE</b></span>
@@ -690,11 +1079,45 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
           <!-- number field -->
           <div class="d-num-row">
             <div class="d-num-field-wrap">
-              <button class="d-cc-btn">
-                <span class="flag">🇺🇸</span>
-                <span class="code">+1</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
+              <div class="d-cc-wrap">
+                <button class="d-cc-btn" id="ccBtn" type="button" onclick="toggleCcDropdown()">
+                  <span class="flag" id="ccFlag">🇺🇸</span>
+                  <span class="code" id="ccCode">+1</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="d-cc-dropdown" id="ccDropdown">
+                  <div class="d-cc-opt" onclick="selectDialCountry('US')">
+                    <span class="flag">🇺🇸</span>
+                    <span>United States</span>
+                    <small>+1</small>
+                  </div>
+                  <div class="d-cc-opt" onclick="selectDialCountry('GB')">
+                    <span class="flag">🇬🇧</span>
+                    <span>United Kingdom</span>
+                    <small>+44</small>
+                  </div>
+                  <div class="d-cc-opt" onclick="selectDialCountry('CA')">
+                    <span class="flag">🇨🇦</span>
+                    <span>Canada</span>
+                    <small>+1</small>
+                  </div>
+                  <div class="d-cc-opt" onclick="selectDialCountry('AU')">
+                    <span class="flag">🇦🇺</span>
+                    <span>Australia</span>
+                    <small>+61</small>
+                  </div>
+                  <div class="d-cc-opt" onclick="selectDialCountry('DE')">
+                    <span class="flag">🇩🇪</span>
+                    <span>Germany</span>
+                    <small>+49</small>
+                  </div>
+                  <div class="d-cc-opt" onclick="selectDialCountry('IN')">
+                    <span class="flag">🇮🇳</span>
+                    <span>India</span>
+                    <small>+91</small>
+                  </div>
+                </div>
+              </div>
               <input class="d-num-input" id="numInput" type="tel" placeholder="Enter phone number" readonly>
             </div>
           </div>
@@ -702,16 +1125,46 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
           <!-- call from row -->
           <div class="d-caller-row">
             <span class="d-caller-label">Call from:</span>
-            <button class="d-caller-sel">
-              <span>🌐</span>
-              <span class="sel-txt">Public number</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
+            <div class="d-caller-wrap">
+              <button class="d-caller-sel" type="button" onclick="toggleCallerDropdown()">
+                <span>🌐</span>
+                <span class="sel-txt" id="callerSelTxt">Public number</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="d-caller-dropdown" id="callerDropdown">
+                <div class="d-caller-section-label">Custom caller IDs</div>
+                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                  <span>🇺🇸</span>
+                  <span>+1 815 367 8725</span>
+                  <span class="d-caller-pill">Verified</span>
+                </div>
+                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                  <span>🇦🇪</span>
+                  <span>+971 52 745 9432</span>
+                  <span class="d-caller-pill">Verified</span>
+                </div>
+                <div class="d-caller-section-label">Default options</div>
+                <div class="d-caller-opt" onclick="selectCallerProfile('public')">
+                  <div class="d-caller-opt-icon">🌐</div>
+                  <span>Public number</span>
+                </div>
+                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                  <div class="d-caller-opt-icon">👤</div>
+                  <span>Custom caller ID</span>
+                  <span class="d-caller-pill">FREE</span>
+                </div>
+                <div class="d-caller-opt" onclick="selectCallerProfile('buy')">
+                  <div class="d-caller-opt-icon">📞</div>
+                  <span>Buy phone number</span>
+                  <span class="d-caller-pill">$1.95/month</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- add contact -->
           <div class="d-add-contact">
-            <button>
+            <button type="button" onclick="openContactModal()">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
               Add contact
             </button>
@@ -736,9 +1189,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
           <!-- BOTTOM ROW: # | BIG CALL | backspace -->
           <div class="d-call-row">
             <div style="display:flex;justify-content:center">
-              <button class="d-side-btn" onclick="kp('#')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>
-              </button>
+              <button class="d-side-btn" id="modeToggleBtn" type="button" onclick="toggleInputMode()">ABC</button>
             </div>
             <div style="display:flex;justify-content:center">
               <button class="d-big-call-btn" id="bigCallBtn" onclick="callOrHangup()">
@@ -1033,6 +1484,112 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;t
   <div class="in-btns"><button class="btn-acc" onclick="acceptCall()">Accept</button><button class="btn-dec" onclick="declineCall()">Decline</button></div>
 </div>
 
+<!-- ADD CONTACT MODAL -->
+<div class="call-overlay" id="contactModal" style="position:fixed;inset:auto 16px 16px auto;width:320px;align-items:stretch;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <h3 style="font-size:15px;font-weight:700;color:var(--text);">Add contact</h3>
+    <button type="button" onclick="closeContactModal()" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:14px;">✕</button>
+  </div>
+  <form onsubmit="saveContact(event)" style="width:100%;display:flex;flex-direction:column;gap:10px;">
+    <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
+      Name
+      <input id="contactName" type="text" placeholder="e.g. Sarah (Bank)" style="border-radius:10px;border:1px solid var(--border);padding:8px 10px;font-size:13px;background:var(--bg2);color:var(--text);outline:none;">
+    </label>
+    <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
+      Number
+      <input id="contactNumber" type="text" placeholder="+1 555 000 0000" style="border-radius:10px;border:1px solid var(--border);padding:8px 10px;font-size:13px;background:var(--bg2);color:var(--text);outline:none;">
+    </label>
+    <button type="submit" style="margin-top:4px;padding:10px 12px;border-radius:12px;border:none;background:#00e5a0;color:#0a0e1a;font-weight:600;font-size:14px;cursor:pointer;">
+      Save &amp; use number
+    </button>
+  </form>
+</div>
+
+<!-- CUSTOM CALLER ID MODAL -->
+<div class="modal-backdrop" id="customCallerModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Add custom caller ID</div>
+      <button class="modal-close-btn" type="button" onclick="closeCustomCallerModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field-label">Import a phone number you already own.</div>
+      <input id="customCallerInput" class="modal-input" type="tel" placeholder="Enter number to verify (e.g. +12125551234)">
+      <div class="modal-note">
+        <div class="modal-note-title">
+          <span>i</span>
+          <strong>Note</strong>
+        </div>
+        <div>Custom caller ID rates may differ from our public numbers. Always check the dialer for current pricing before making calls.</div>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--text2);">Your custom caller IDs</div>
+      <div class="modal-list">
+        <div class="modal-list-row">
+          <div class="modal-list-num">+1 815 367 8725</div>
+          <div class="modal-list-sub">Verified</div>
+        </div>
+        <div class="modal-list-row">
+          <div class="modal-list-num">+971 52 745 9432</div>
+          <div class="modal-list-sub">Verified</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" type="button" onclick="closeCustomCallerModal()">Cancel</button>
+        <button class="modal-btn modal-btn-primary" type="button" onclick="submitCustomCaller()">Add caller ID</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUY PHONE NUMBER MODAL -->
+<div class="modal-backdrop" id="buyNumberModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Buy phone number</div>
+      <button class="modal-close-btn" type="button" onclick="closeBuyNumberModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field-label">Purchase a new number to make and receive calls.</div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <select class="modal-input" style="max-width:120px;padding-right:26px;">
+          <option>US +1</option>
+          <option>UK +44</option>
+          <option>UAE +971</option>
+        </select>
+        <input class="modal-input" type="text" placeholder="Enter area code">
+        <button class="modal-btn modal-btn-primary" type="button">Search</button>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--text2);">Available numbers</div>
+      <div class="modal-list">
+        <div class="modal-list-row" style="flex-direction:row;align-items:center;justify-content:space-between;">
+          <div>
+            <div class="modal-list-num">+1 315 847 8380</div>
+            <div style="font-size:11px;color:var(--text3);">$1.95/month</div>
+          </div>
+          <button class="modal-btn modal-btn-primary" type="button" style="border-radius:8px;padding:6px 14px;">Buy</button>
+        </div>
+        <div class="modal-list-row" style="flex-direction:row;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+          <div>
+            <div class="modal-list-num">+1 478 400 9008</div>
+            <div style="font-size:11px;color:var(--text3);">$1.95/month</div>
+          </div>
+          <button class="modal-btn modal-btn-primary" type="button" style="border-radius:8px;padding:6px 14px;">Buy</button>
+        </div>
+        <div class="modal-list-row" style="flex-direction:row;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+          <div>
+            <div class="modal-list-num">+1 928 414 8644</div>
+            <div style="font-size:11px;color:var(--text3);">$1.95/month</div>
+          </div>
+          <button class="modal-btn modal-btn-primary" type="button" style="border-radius:8px;padding:6px 14px;">Buy</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" type="button" onclick="closeBuyNumberModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const BACKEND_URL = 'http://localhost:3001';
 
@@ -1050,13 +1607,38 @@ window.addEventListener('scroll',()=>{
   document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>20);
 });
 
-// ── flag cycle ─────────────────────────────────────
-const flags=[{e:'🇺🇸',c:'US'},{e:'🇬🇧',c:'GB'},{e:'🇦🇺',c:'AU'},{e:'🇳🇬',c:'NG'},{e:'🇧🇷',c:'BR'},{e:'🇯🇵',c:'JP'},{e:'🇩🇪',c:'DE'},{e:'🇦🇪',c:'AE'},{e:'🇮🇳',c:'IN'}];
+// ── flag / country name cycle for hero button ──────
+const flags=[
+  {label:'United States'},
+  {label:'United Kingdom'},
+  {label:'Australia'},
+  {label:'Nigeria'},
+  {label:'Brazil'},
+  {label:'Japan'},
+  {label:'Germany'},
+  {label:'United Arab Emirates'},
+  {label:'India'}
+];
 let fi=0;
-setInterval(()=>{fi=(fi+1)%flags.length;const f=flags[fi];document.getElementById('flagDisplay').innerHTML=`${f.e} ${f.c}`},2000);
+setInterval(()=>{
+  fi=(fi+1)%flags.length;
+  const f=flags[fi];
+  document.getElementById('flagDisplay').textContent=f.label;
+},2000);
 
 // ── dialer state ───────────────────────────────────
 let num='',device=null,activeCall=null,timerInt=null,timerSec=0,isOnline=false,isMuted=false,pending=null,inCall=false;
+let inputMode='num';
+
+const dialCountries={
+  US:{flag:'🇺🇸',code:'+1',label:'United States',rate:'from $0.02/min'},
+  GB:{flag:'🇬🇧',code:'+44',label:'United Kingdom',rate:'from $0.02/min'},
+  CA:{flag:'🇨🇦',code:'+1',label:'Canada',rate:'from $0.02/min'},
+  AU:{flag:'🇦🇺',code:'+61',label:'Australia',rate:'from $0.04/min'},
+  DE:{flag:'🇩🇪',code:'+49',label:'Germany',rate:'from $0.02/min'},
+  IN:{flag:'🇮🇳',code:'+91',label:'India',rate:'from $0.01/min'}
+};
+let currentDialCountry='US';
 
 // ── tab switch ─────────────────────────────────────
 function switchTab(tab){
@@ -1103,15 +1685,108 @@ document.addEventListener('keydown',e=>{
   if(document.activeElement.id==='numInput')return;
   if('0123456789*#'.includes(e.key)){kp(e.key);return}
   if(e.key==='+'){kp('+');return}
+  if(inputMode==='alpha' && /^[a-zA-Z]$/.test(e.key)){
+    if(num.length>=20)return;
+    num+=e.key.toUpperCase();
+    renderNum();
+    return;
+  }
   if(e.key==='Backspace'){e.preventDefault();bs();return}
   if(e.key==='Enter')callOrHangup();
 });
 
 document.getElementById('numInput').addEventListener('input',function(){
-  num=this.value.replace(/[^0-9+*#]/g,'');
+  const re=inputMode==='alpha'?/[^0-9+*#A-Za-z]/g:/[^0-9+*#]/g;
+  num=this.value.replace(re,'');
   this.value=num;
   updateCallBtn();
 });
+
+function toggleInputMode(){
+  inputMode=inputMode==='num'?'alpha':'num';
+  const btn=document.getElementById('modeToggleBtn');
+  btn.textContent=inputMode==='num'?'ABC':'123';
+}
+
+function toggleCcDropdown(){
+  document.getElementById('ccDropdown').classList.toggle('open');
+}
+function selectDialCountry(code){
+  const cfg=dialCountries[code]||dialCountries.US;
+  currentDialCountry=code;
+  document.getElementById('ccFlag').textContent=cfg.flag;
+  document.getElementById('ccCode').textContent=cfg.code;
+  const rateEl=document.querySelector('.d-rate-hint');
+  if(rateEl){
+    rateEl.innerHTML=`${cfg.label} · <span>${cfg.rate}</span>`;
+  }
+  document.getElementById('ccDropdown').classList.remove('open');
+}
+
+function toggleCallerDropdown(){
+  document.getElementById('callerDropdown').classList.toggle('open');
+}
+function selectCallerProfile(key){
+  const map={
+    public:'Public number',
+    customer:'Custom caller ID',
+    buy:'Buy phone number'
+  };
+  const label=map[key]||map.public;
+  document.getElementById('callerSelTxt').textContent=label;
+  document.getElementById('callerDropdown').classList.remove('open');
+  if(key==='buy'){
+    openBuyNumberModal();
+  }
+  if(key==='customer'){
+    openCustomCallerModal();
+  }
+}
+
+function openContactModal(){
+  const m=document.getElementById('contactModal');
+  m.classList.add('show');
+}
+function closeContactModal(){
+  const m=document.getElementById('contactModal');
+  m.classList.remove('show');
+}
+function saveContact(e){
+  e.preventDefault();
+  const name=document.getElementById('contactName').value.trim();
+  const number=document.getElementById('contactNumber').value.trim();
+  if(!number){
+    showToast('Please enter a number to save.','e');
+    return;
+  }
+  num=number;
+  renderNum();
+  closeContactModal();
+  showToast(`Saved ${name||'contact'} and filled number.`,'s');
+}
+
+function openCustomCallerModal(){
+  document.getElementById('customCallerModal').classList.add('show');
+}
+function closeCustomCallerModal(){
+  document.getElementById('customCallerModal').classList.remove('show');
+}
+function submitCustomCaller(){
+  const val=document.getElementById('customCallerInput').value.trim();
+  if(!val){
+    showToast('Enter a number to verify.','e');
+    return;
+  }
+  showToast('We will verify this caller ID in the backend later.','i');
+  closeCustomCallerModal();
+}
+
+function openBuyNumberModal(){
+  document.getElementById('buyNumberModal').classList.add('show');
+}
+function closeBuyNumberModal(){
+  document.getElementById('buyNumberModal').classList.remove('show');
+}
 
 // ── go online ──────────────────────────────────────
 async function goOnline(){
@@ -1234,6 +1909,10 @@ function selectCountry(flag,name,mobile,landline){
   }
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.rates-sel-wrap'))document.getElementById('ratesDropdown').classList.remove('open')});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.d-cc-wrap'))document.getElementById('ccDropdown').classList.remove('open');
+  if(!e.target.closest('.d-caller-wrap'))document.getElementById('callerDropdown').classList.remove('open');
+});
 
 // ── faq ────────────────────────────────────────────
 function faqToggle(btn){const item=btn.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open')}
