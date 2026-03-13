@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ringvoo — Cheap International Calls Directly From Your Browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.9.0/dist/twilio.min.js"></script>
+<style>
+/* ── TAILWIND-LIKE BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── THEME ── */
+:root{--bg:#ffffff;--bg2:#f9fafb;--bg3:#f3f4f6;--text:#111827;--text2:#4b5563;--text3:#9ca3af;--text4:#d1d5db;--border:#e5e7eb;--border2:#d1d5db;--green:#00e5a0;--green2:#00b87f;--green3:#00ffb0;--dark:#0a0e1a;--dark2:#0d1220}
+[data-theme="dark"]{--bg:#0a0e1a;--bg2:#0d1220;--bg3:rgba(255,255,255,0.03);--text:#ffffff;--text2:rgba(255,255,255,0.65);--text3:rgba(255,255,255,0.4);--text4:rgba(255,255,255,0.2);--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1)}
+
+body{background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+
+/* ── SPIN ANIMATION ── */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rippleOut{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.8);opacity:0}}
+@keyframes flagCycle{0%,8%{opacity:1}10%,100%{opacity:0}}
+
+/* ── NAV ── */
+nav{
+  position:fixed;inset:0 0 auto;z-index:50;
+  background:transparent;
+  transition:all .5s;
+}
+nav.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+[data-theme="dark"] nav.scrolled{background:rgba(10,14,26,.9)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+
+/* LOGO */
+.logo-link{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-icon-wrap{position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-ring-outer{position:absolute;inset:0;animation:spin 12s linear infinite}
+.logo-ring-inner{position:absolute;inset:0}
+.logo-phone{position:relative;z-index:10;color:#0a0e1a}
+.logo-text-wrap{display:flex;flex-direction:column;line-height:1}
+.logo-ring-txt{font-size:10px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--text3)}
+.logo-voo-txt{font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-top:-2px}
+.logo-voo-txt span{color:#00e5a0}
+
+.nav-links-wrap{display:flex;align-items:center;gap:32px}
+.nav-link{font-size:14px;font-weight:500;color:var(--text2);text-decoration:none;transition:color .3s}
+.nav-link:hover{color:#00e5a0}
+.nav-actions{display:flex;align-items:center;gap:12px}
+
+.btn-theme{width:36px;height:36px;border-radius:12px;background:var(--bg3);border:none;display:grid;place-items:center;color:var(--text3);cursor:pointer;transition:all .2s}
+.btn-theme:hover{background:var(--border);color:var(--text2)}
+.icon-sun{display:block}[data-theme="dark"] .icon-sun{display:none}
+.icon-moon{display:none}[data-theme="dark"] .icon-moon{display:block}
+
+.btn-login{font-size:14px;font-weight:500;color:var(--text2);background:transparent;border:none;padding:8px 16px;cursor:pointer;transition:color .3s}
+.btn-login:hover{color:var(--text)}
+.btn-start{font-size:14px;font-weight:600;background:#00e5a0;color:#0a0e1a;border:none;padding:10px 20px;border-radius:12px;cursor:pointer;transition:all .3s}
+.btn-start:hover{background:#00ffb0;box-shadow:0 8px 20px rgba(0,229,160,.2)}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:100vh;
+  background:var(--bg);
+  overflow:hidden;padding-top:96px;padding-bottom:64px;
+  display:flex;align-items:center;
+  transition:background .3s;
+}
+[data-theme="dark"] .hero{background:#0a0e1a}
+.hero-blob1{position:absolute;top:0;right:0;width:800px;height:800px;background:rgba(0,229,160,.06);border-radius:50%;filter:blur(120px);transform:translate(25%,-25%);pointer-events:none}
+[data-theme="dark"] .hero-blob1{background:rgba(0,229,160,.03)}
+.hero-blob2{position:absolute;bottom:0;left:0;width:600px;height:600px;background:rgba(0,229,160,.04);border-radius:50%;filter:blur(100px);transform:translate(-33%,33%);pointer-events:none}
+[data-theme="dark"] .hero-blob2{background:rgba(0,229,160,.02)}
+.hero-grid{position:absolute;inset:0;opacity:.025;background-image:linear-gradient(rgba(0,0,0,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.15) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+[data-theme="dark"] .hero-grid{opacity:.03}
+
+.hero-inner{position:relative;max-width:1280px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:48px;align-items:center}
+@media(min-width:1024px){.hero-inner{flex-direction:row;gap:64px}}
+
+/* LEFT */
+.hero-left{flex:1;text-align:center}
+@media(min-width:1024px){.hero-left{text-align:left}}
+
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);border-radius:100px;padding:6px 16px;margin-bottom:32px}
+.hero-badge-dot{width:8px;height:8px;border-radius:50%;background:#00e5a0;animation:pulse2 2s infinite}
+.hero-badge-txt{font-size:12px;font-weight:600;color:#00b87f;letter-spacing:.05em}
+[data-theme="dark"] .hero-badge-txt{color:#00e5a0}
+
+.hero-h1{font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px;color:var(--text)}
+.hero-h1 .green{color:#00e5a0}
+.hero-h1 .dim{font-size:.6em;font-weight:600;color:var(--text3)}
+
+.hero-p{font-size:16px;color:var(--text2);max-width:480px;margin:0 auto 24px;line-height:1.65}
+@media(min-width:1024px){.hero-p{margin-left:0}}
+
+.hero-from{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:24px}
+.hero-from span{color:#00b87f;font-weight:700}
+[data-theme="dark"] .hero-from span{color:#00e5a0}
+
+.hero-ctas{display:flex;flex-direction:column;align-items:center;gap:16px;justify-content:center;margin-bottom:40px}
+@media(min-width:640px){.hero-ctas{flex-direction:row}}
+@media(min-width:1024px){.hero-ctas{justify-content:flex-start}}
+
+.btn-hero{display:flex;align-items:center;gap:8px;background:#00e5a0;color:#0a0e1a;font-weight:700;padding:16px 32px;border-radius:16px;font-size:14px;border:none;cursor:pointer;transition:all .3s;box-shadow:0 20px 40px rgba(0,229,160,.2)}
+.btn-hero:hover{background:#00ffb0;box-shadow:0 20px 40px rgba(0,229,160,.3)}
+.hero-free{font-size:14px;color:var(--text3);font-weight:500}
+.hero-free b{color:#00b87f}
+[data-theme="dark"] .hero-free b{color:#00e5a0}
+
+.hero-trust{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+@media(min-width:1024px){.hero-trust{justify-content:flex-start}}
+.trust-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border-radius:100px;padding:6px 12px}
+[data-theme="dark"] .trust-pill{background:rgba(255,255,255,.06)}
+.trust-pill svg{width:14px;height:14px;flex-shrink:0}
+.trust-pill span{font-size:12px;font-weight:500;color:var(--text2)}
+
+/* FLAG ANIMATION */
+.flag-rotate{display:inline-flex;align-items:center;gap:4px;min-width:3.5rem}
+.flag-item{position:absolute;display:inline-flex;align-items:center;gap:4px;animation:flagCycle 8s infinite}
+
+/* ── DIALER CARD ── */
+.dialer-wrap{flex-shrink:0;position:relative}
+.dialer-glow{position:absolute;inset:-8px;background:linear-gradient(to bottom,rgba(0,229,160,.15),rgba(0,229,160,.05),transparent);border-radius:32px;filter:blur(24px)}
+.dialer-card{
+  position:relative;
+  background:#ffffff;
+  border:1px solid rgba(229,231,235,.8);
+  border-radius:28px;
+  box-shadow:0 25px 50px rgba(107,114,128,.4),0 12px 24px rgba(0,0,0,.08);
+  width:400px;
+  overflow:hidden;
+  transition:background .3s,border-color .3s;
+}
+[data-theme="dark"] .dialer-card{background:#0f1623;border-color:rgba(255,255,255,.08);box-shadow:0 25px 50px rgba(0,0,0,.5)}
+
+/* dialer top bar */
+.d-topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px}
+.d-go-online-btn{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;
+  padding:6px 14px;border-radius:100px;border:1px solid;
+  cursor:pointer;transition:all .3s;
+  background:var(--bg3);border-color:var(--border2);color:var(--text3);
+}
+[data-theme="dark"] .d-go-online-btn{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.d-go-online-btn.online{background:#00e5a0;border-color:#00e5a0;color:#0a0e1a}
+.d-go-online-btn.online .d-status-dot{background:#0a0e1a}
+.d-status-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:all .3s}
+.d-status-dot.online{background:#0a0e1a;animation:pulse2 2s infinite}
+.d-status-dot.pulsing{background:#00e5a0;animation:pulse2 2s infinite}
+
+.d-balance-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:100px;
+  padding:6px 12px;cursor:pointer;transition:all .2s;
+}
+[data-theme="dark"] .d-balance-btn{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+.d-balance-btn:hover{border-color:rgba(0,229,160,.4)}
+.d-bal-label{font-size:12px;color:var(--text3)}
+.d-bal-val{font-size:12px;font-weight:700;color:#00b87f}
+[data-theme="dark"] .d-bal-val{color:#00e5a0}
+
+/* tabs */
+.d-tabs-wrap{margin:0 20px 16px;background:var(--bg2);border-radius:12px;padding:4px;display:flex}
+[data-theme="dark"] .d-tabs-wrap{background:rgba(255,255,255,.04)}
+.d-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .2s;color:var(--text3);background:transparent}
+.d-tab.active{background:#ffffff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+[data-theme="dark"] .d-tab.active{background:rgba(255,255,255,.1);color:#ffffff}
+.d-tab svg{width:12px;height:12px}
+
+/* number input row */
+.d-num-row{margin:0 20px 12px;position:relative}
+.d-num-field-wrap{
+  display:flex;align-items:center;
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:12px;transition:border-color .2s;
+}
+[data-theme="dark"] .d-num-field-wrap{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.d-num-field-wrap:focus-within{border-color:rgba(0,229,160,.5)}
+
+.d-cc-btn{display:flex;align-items:center;gap:6px;padding-right:12px;border-right:1px solid var(--border);flex-shrink:0;background:none;border-left:none;border-top:none;border-bottom:none;cursor:pointer}
+[data-theme="dark"] .d-cc-btn{border-right-color:rgba(255,255,255,.1)}
+.d-cc-btn .flag{font-size:20px}
+.d-cc-btn .code{font-size:14px;font-weight:500;color:var(--text2)}
+.d-cc-btn svg{width:12px;height:12px;color:var(--text3)}
+
+.d-num-input{flex:1;padding-left:12px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;min-width:0}
+.d-num-input::placeholder{color:var(--text4)}
+[data-theme="dark"] .d-num-input{color:#ffffff}
+[data-theme="dark"] .d-num-input::placeholder{color:rgba(255,255,255,.2)}
+
+/* caller row */
+.d-caller-row{margin:0 20px 8px;display:flex;align-items:center;gap:12px}
+.d-caller-label{font-size:12px;color:var(--text3);white-space:nowrap}
+.d-caller-sel{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;cursor:pointer;transition:border-color .2s}
+[data-theme="dark"] .d-caller-sel{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.d-caller-sel:hover{border-color:rgba(0,229,160,.4)}
+.d-caller-sel span{font-size:12px}
+.d-caller-sel .sel-txt{font-size:12px;font-weight:500;color:var(--text2)}
+.d-caller-sel svg{width:12px;height:12px;color:var(--text3)}
+
+/* add contact */
+.d-add-contact{display:flex;justify-content:center;margin-bottom:8px}
+.d-add-contact button{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);border:1px dashed var(--border);border-radius:100px;padding:6px 16px;background:none;cursor:pointer;transition:all .2s}
+.d-add-contact button:hover{color:#00b87f;border-color:rgba(0,229,160,.4)}
+[data-theme="dark"] .d-add-contact button:hover{color:#00e5a0}
+
+/* KEYPAD — ROUND KEYS */
+.d-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 0;padding:4px 24px 20px}
+.d-key{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:68px;height:68px;border-radius:50%;margin:0 auto;
+  background:var(--bg2);border:1px solid var(--border);
+  cursor:pointer;user-select:none;transition:all .1s;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] .d-key{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
+.d-key:hover{background:var(--bg3);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+[data-theme="dark"] .d-key:hover{background:rgba(255,255,255,.08)}
+.d-key:active{transform:scale(.92);box-shadow:none}
+.dk-num{font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.dk-sub{font-size:9px;font-weight:500;letter-spacing:.18em;color:var(--text3);margin-top:2px;text-transform:uppercase}
+
+/* bottom call row */
+.d-call-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 24px 24px}
+.d-side-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--bg2);border:1px solid var(--border);cursor:pointer;transition:all .2s;color:var(--text3)}
+[data-theme="dark"] .d-side-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
+.d-side-btn:hover{background:var(--bg3);color:var(--text2)}
+[data-theme="dark"] .d-side-btn:hover{background:rgba(255,255,255,.08)}
+.d-side-btn:disabled{opacity:.3;cursor:not-allowed}
+.d-side-btn.active{border-color:#00e5a0;color:#00b87f;background:rgba(0,229,160,.1)}
+[data-theme="dark"] .d-side-btn.active{color:#00e5a0}
+
+.d-big-call-btn{
+  width:72px;height:72px;border-radius:50%;
+  display:grid;place-items:center;
+  border:none;cursor:pointer;transition:all .3s;
+  background:#d1d5db;/* disabled state */
+}
+[data-theme="dark"] .d-big-call-btn{background:rgba(255,255,255,.1)}
+.d-big-call-btn.ready{background:#00e5a0;box-shadow:0 8px 24px rgba(0,229,160,.4)}
+.d-big-call-btn.ready:hover{background:#00ffb0;transform:scale(1.06)}
+.d-big-call-btn.calling{background:#ef4444;box-shadow:0 8px 24px rgba(239,68,68,.4)}
+.d-big-call-btn.calling:hover{background:#dc2626;transform:scale(1.06)}
+.d-big-call-btn svg{width:28px;height:28px;color:var(--text3)}
+.d-big-call-btn.ready svg,.d-big-call-btn.calling svg{color:#0a0e1a}
+[data-theme="dark"] .d-big-call-btn svg{color:rgba(255,255,255,.3)}
+[data-theme="dark"] .d-big-call-btn.ready svg,[data-theme="dark"] .d-big-call-btn.calling svg{color:#0a0e1a}
+
+/* rate hint */
+.d-rate-hint{padding-bottom:16px;text-align:center;font-size:11px;color:var(--text3)}
+.d-rate-hint span{color:#00b87f;font-weight:600}
+[data-theme="dark"] .d-rate-hint span{color:#00e5a0}
+
+/* RECENT PANEL */
+.d-recent-panel{display:none;padding:0 0 8px}
+.d-recent-panel.show{display:block}
+.d-r-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:0 20px 8px}
+.d-r-item{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;cursor:pointer;transition:background .15s}
+.d-r-item:hover{background:var(--bg2)}
+[data-theme="dark"] .d-r-item:hover{background:rgba(255,255,255,.03)}
+.d-r-l{display:flex;align-items:center;gap:8px}
+.d-r-badge{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0}
+.d-r-badge.out{background:rgba(0,229,160,.1);color:#00b87f;border:1px solid rgba(0,229,160,.2)}
+[data-theme="dark"] .d-r-badge.out{color:#00e5a0}
+.d-r-badge.in{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.d-r-badge.miss{background:#fff1f2;color:#dc2626;border:1px solid #fecdd3}
+[data-theme="dark"] .d-r-badge.miss{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.2)}
+.d-r-num{font-size:12px;font-weight:500;color:var(--text)}
+.d-r-sub{font-size:10px;color:var(--text3)}
+.d-r-meta{text-align:right}
+.d-r-time{font-size:10px;color:var(--text3)}
+.d-r-dur{font-size:10px;color:var(--text3)}
+.d-r-back-row{text-align:center;padding:8px 20px 4px}
+.d-r-back{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:color .2s}
+.d-r-back:hover{color:#00b87f}
+
+/* CALL OVERLAY */
+.call-overlay{
+  position:absolute;inset:0;background:#ffffff;border-radius:28px;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:20;padding:32px 24px;
+}
+[data-theme="dark"] .call-overlay{background:#0f1623}
+.call-overlay.show{display:flex}
+.rpl-wrap{position:relative;width:72px;height:72px;margin-bottom:20px}
+.rpl{position:absolute;border-radius:50%;border:2px solid #00e5a0;opacity:0;animation:rippleOut 2.4s ease-out infinite}
+.rpl:nth-child(1){inset:0;animation-delay:0s}
+.rpl:nth-child(2){inset:-14px;animation-delay:.6s}
+.rpl:nth-child(3){inset:-28px;animation-delay:1.2s}
+.rpl-c{position:absolute;inset:0;border-radius:50%;background:rgba(0,229,160,.1);border:1.5px solid rgba(0,229,160,.25);display:grid;place-items:center;color:#00b87f}
+[data-theme="dark"] .rpl-c{color:#00e5a0}
+.ov-num{font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:.5px}
+.ov-status{font-size:13px;color:var(--text3);margin-bottom:6px}
+.ov-timer{font-size:28px;font-weight:700;color:#00b87f;letter-spacing:3px;margin-bottom:28px;min-height:38px;font-variant-numeric:tabular-nums}
+[data-theme="dark"] .ov-timer{color:#00e5a0}
+.ov-ctrls{display:flex;align-items:center;gap:12px}
+.ov-ctrl{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);color:var(--text3);display:grid;place-items:center;cursor:pointer;transition:all .2s}
+.ov-ctrl:hover{border-color:var(--border2);color:var(--text2)}
+.ov-ctrl.active{border-color:#00e5a0;color:#00b87f;background:rgba(0,229,160,.1)}
+[data-theme="dark"] .ov-ctrl.active{color:#00e5a0}
+.ov-end{width:52px;height:52px;border-radius:50%;border:none;background:#ef4444;color:#fff;display:grid;place-items:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(239,68,68,.35)}
+.ov-end:hover{background:#dc2626;transform:scale(1.06)}
+
+/* ── SECTIONS ── */
+.section-hiw{background:var(--bg2);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-hiw{background:#0d1220}
+.section-feat{background:var(--bg);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-feat{background:#0a0e1a}
+.section-price{background:var(--bg2);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-price{background:#0d1220}
+.section-rates{background:var(--bg);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-rates{background:#0a0e1a}
+.section-testi{background:var(--bg2);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-testi{background:#0d1220}
+.section-faq{background:var(--bg);padding:96px 0;transition:background .3s}
+[data-theme="dark"] .section-faq{background:#0a0e1a}
+.section-cta{background:var(--bg2);padding:96px 0;position:relative;overflow:hidden;transition:background .3s}
+[data-theme="dark"] .section-cta{background:#0d1220}
+
+.max-w-5{max-width:1024px;margin:0 auto;padding:0 24px}
+.max-w-3{max-width:768px;margin:0 auto;padding:0 24px}
+.max-w-6{max-width:1152px;margin:0 auto;padding:0 24px}
+
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-tag{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#00b87f;margin-bottom:12px}
+[data-theme="dark"] .sec-tag{color:#00e5a0}
+.sec-title{font-size:clamp(26px,3.5vw,40px);font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1.1}
+.sec-title .g{color:#00e5a0}
+
+/* HIW CARDS */
+.hiw-grid{display:grid;gap:24px}
+@media(min-width:768px){.hiw-grid{grid-template-columns:repeat(3,1fr)}}
+.hiw-card{
+  position:relative;
+  background:#ffffff;border:1px solid var(--border);border-radius:16px;
+  padding:32px;transition:all .5s;
+}
+[data-theme="dark"] .hiw-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.hiw-card:hover{border-color:rgba(0,229,160,.3);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.hiw-num-bg{position:absolute;top:16px;right:24px;font-size:80px;font-weight:900;color:var(--bg3);line-height:1}
+[data-theme="dark"] .hiw-num-bg{color:rgba(255,255,255,.03)}
+.hiw-icon{width:48px;height:48px;background:rgba(0,229,160,.1);border-radius:12px;display:grid;place-items:center;margin-bottom:20px;color:#00b87f;transition:transform .3s}
+[data-theme="dark"] .hiw-icon{color:#00e5a0}
+.hiw-card:hover .hiw-icon{transform:scale(1.1)}
+.hiw-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.hiw-desc{font-size:14px;color:var(--text3);line-height:1.65}
+
+/* FEATURES */
+.feat-grid{display:grid;gap:20px}
+@media(min-width:640px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
+.feat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:24px;transition:all .5s;
+}
+[data-theme="dark"] .feat-card{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.05)}
+.feat-card:hover{border-color:rgba(0,229,160,.25);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+[data-theme="dark"] .feat-card:hover{background:rgba(255,255,255,.04)}
+.feat-icon{width:40px;height:40px;background:rgba(0,229,160,.1);border-radius:10px;display:grid;place-items:center;margin-bottom:16px;color:#00b87f;transition:background .3s}
+[data-theme="dark"] .feat-icon{color:#00e5a0}
+.feat-card:hover .feat-icon{background:rgba(0,229,160,.2)}
+.feat-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
+.feat-desc{font-size:14px;color:var(--text3);line-height:1.65}
+
+/* PRICING */
+.price-grid{display:grid;gap:16px;margin-bottom:48px}
+@media(min-width:640px){.price-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.price-grid{grid-template-columns:repeat(4,1fr)}}
+.price-card{
+  position:relative;background:#ffffff;border:1px solid var(--border);
+  border-radius:16px;padding:24px;text-align:center;
+  cursor:pointer;transition:all .5s;box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] .price-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.price-card:hover{transform:scale(1.02)}
+.price-card.hot{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);box-shadow:0 20px 40px rgba(0,229,160,.1)}
+.price-hot-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:4px;
+  background:#00e5a0;color:#0a0e1a;
+  font-size:10px;font-weight:700;padding:4px 12px;border-radius:100px;
+  white-space:nowrap;
+}
+.price-hot-badge svg{width:12px;height:12px}
+.price-amt{font-size:32px;font-weight:900;color:var(--text);margin-bottom:4px}
+.price-bonus{font-size:12px;font-weight:600;color:#00b87f}
+[data-theme="dark"] .price-bonus{color:#00e5a0}
+.price-sub{font-size:14px;color:var(--text3);margin-top:8px;margin-bottom:20px}
+.price-btn{
+  width:100%;padding:10px;border-radius:12px;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .3s;
+  background:var(--bg3);color:var(--text2);border:1px solid var(--border);
+}
+[data-theme="dark"] .price-btn{background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.1)}
+.price-btn:hover{background:var(--border);color:var(--text)}
+[data-theme="dark"] .price-btn:hover{background:rgba(255,255,255,.1)}
+.price-card.hot .price-btn{background:#00e5a0;color:#0a0e1a;border:none;box-shadow:0 8px 20px rgba(0,229,160,.2)}
+.price-card.hot .price-btn:hover{background:#00ffb0}
+
+.price-perks{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px 32px}
+.price-perk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text3)}
+.price-perk svg{width:16px;height:16px;color:#00e5a0}
+
+/* RATES */
+.rates-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;transition:background .3s,border-color .3s}
+[data-theme="dark"] .rates-box{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.rates-label{font-size:12px;color:var(--text3);margin-bottom:8px;display:block}
+.rates-sel-wrap{position:relative;margin-bottom:32px}
+.rates-trigger{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:#ffffff;border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;cursor:pointer;transition:border-color .2s;box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] .rates-trigger{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.rates-trigger:hover{border-color:rgba(0,229,160,.4)}
+.rates-trigger-l{display:flex;align-items:center;gap:12px}
+.rates-flag{font-size:24px}
+.rates-country{font-size:15px;font-weight:500;color:var(--text)}
+.rates-chevron{color:var(--text3)}
+
+/* rates dropdown */
+.rates-dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:20;
+  background:#ffffff;border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.12);max-height:260px;overflow-y:auto;display:none;
+}
+[data-theme="dark"] .rates-dropdown{background:#1a2535;border-color:rgba(255,255,255,.1)}
+.rates-dropdown.open{display:block}
+.rates-opt{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .15s;font-size:14px;color:var(--text)}
+.rates-opt:hover{background:var(--bg2)}
+[data-theme="dark"] .rates-opt:hover{background:rgba(255,255,255,.05)}
+.rates-opt .flag{font-size:18px}
+
+.rates-cols{display:grid;gap:16px}
+@media(min-width:640px){.rates-cols{grid-template-columns:1fr 1fr}}
+.rate-box{background:#ffffff;border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+[data-theme="dark"] .rate-box{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+.rate-lbl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text3);margin-bottom:12px}
+.rate-lbl svg{width:16px;height:16px;color:#00b87f}
+[data-theme="dark"] .rate-lbl svg{color:#00e5a0}
+.rate-val{font-size:32px;font-weight:900;color:var(--text)}
+.rate-val small{font-size:14px;font-weight:400;color:var(--text3)}
+.rates-note{text-align:center;font-size:12px;color:var(--text4);margin-top:20px}
+
+/* TESTIMONIALS */
+.testi-grid{display:grid;gap:24px}
+@media(min-width:768px){.testi-grid{grid-template-columns:repeat(3,1fr)}}
+.testi-card{background:#ffffff;border:1px solid var(--border);border-radius:16px;padding:24px;transition:all .5s}
+[data-theme="dark"] .testi-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.testi-card:hover{border-color:rgba(0,229,160,.2);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.testi-stars{display:flex;gap:4px;margin-bottom:16px}
+.testi-stars svg{width:16px;height:16px;fill:#00e5a0;color:#00e5a0}
+.testi-text{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-av{width:36px;height:36px;border-radius:50%;background:rgba(0,229,160,.1);display:grid;place-items:center;font-size:12px;font-weight:700;color:#00b87f;flex-shrink:0}
+[data-theme="dark"] .testi-av{color:#00e5a0}
+.testi-name{font-size:14px;font-weight:600;color:var(--text)}
+.testi-loc{font-size:12px;color:var(--text3)}
+
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+[data-theme="dark"] .faq-item{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06)}
+.faq-item.open{border-color:rgba(0,229,160,.3)}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;text-align:left;background:none;border:none;cursor:pointer;gap:16px}
+.faq-q-txt{font-size:14px;font-weight:600;color:var(--text)}
+.faq-chev{width:16px;height:16px;color:var(--text3);flex-shrink:0;transition:transform .3s}
+.faq-item.open .faq-chev{transform:rotate(180deg);color:#00e5a0}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-a-inner{padding:0 24px 16px;font-size:14px;color:var(--text3);line-height:1.7}
+.faq-item.open .faq-a{max-height:200px}
+
+/* CTA SECTION */
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:rgba(0,229,160,.04);border-radius:50%;filter:blur(120px);pointer-events:none}
+.cta-phone-box{width:64px;height:64px;background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);border-radius:16px;display:grid;place-items:center;margin:0 auto 32px;color:#00b87f}
+[data-theme="dark"] .cta-phone-box{color:#00e5a0}
+.cta-title{font-size:clamp(28px,4.5vw,48px);font-weight:800;color:var(--text);margin-bottom:16px;letter-spacing:-1.5px;line-height:1.1}
+.cta-title .g{color:#00e5a0}
+.cta-sub{font-size:16px;color:var(--text3);max-width:400px;margin:0 auto 32px;line-height:1.65}
+.btn-cta-big{display:inline-flex;align-items:center;gap:8px;background:#00e5a0;color:#0a0e1a;font-weight:700;font-size:16px;padding:16px 40px;border-radius:16px;border:none;cursor:pointer;transition:all .3s;box-shadow:0 20px 40px rgba(0,229,160,.2)}
+.btn-cta-big:hover{background:#00ffb0;box-shadow:0 20px 40px rgba(0,229,160,.3)}
+.cta-note{font-size:12px;color:var(--text4);margin-top:16px}
+
+/* FOOTER */
+footer{background:var(--bg3);border-top:1px solid var(--border);padding:64px 0;transition:background .3s,border-color .3s}
+[data-theme="dark"] footer{background:#080b14;border-color:rgba(255,255,255,.04)}
+.foot-inner{max-width:1152px;margin:0 auto;padding:0 24px}
+.foot-grid{display:grid;gap:40px;margin-bottom:48px}
+@media(min-width:640px){.foot-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.foot-grid{grid-template-columns:2fr 1fr 1fr 1fr}}
+.foot-desc{font-size:14px;color:var(--text3);line-height:1.7;max-width:280px;margin-top:16px}
+.foot-col h4{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:16px}
+.foot-col ul{list-style:none}
+.foot-col li{margin-bottom:10px}
+.foot-col a{font-size:14px;color:var(--text3);text-decoration:none;transition:color .3s}
+.foot-col a:hover{color:#00b87f}
+[data-theme="dark"] .foot-col a:hover{color:#00e5a0}
+.foot-bottom{display:flex;flex-direction:column;gap:16px;padding-top:32px;border-top:1px solid var(--border)}
+@media(min-width:640px){.foot-bottom{flex-direction:row;align-items:center;justify-content:space-between}}
+.foot-copy{font-size:12px;color:var(--text4)}
+.foot-links{display:flex;gap:24px}
+.foot-links a{font-size:12px;color:var(--text4);text-decoration:none;transition:color .3s}
+.foot-links a:hover{color:var(--text3)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#ffffff;border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.12);z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(60px);opacity:0;max-width:280px;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"] .toast{background:#1a2535;border-color:rgba(255,255,255,.1)}
+.toast.show{transform:translateY(0);opacity:1}
+.tdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tdot.s{background:#00e5a0}.tdot.e{background:#ef4444}.tdot.i{background:var(--text3)}
+
+/* INCOMING */
+.in-popup{position:fixed;top:76px;right:24px;width:280px;background:#ffffff;border:1.5px solid rgba(0,229,160,.3);border-radius:16px;padding:20px;z-index:999;box-shadow:0 6px 24px rgba(0,229,160,.15),0 10px 30px rgba(0,0,0,.12);display:none;transform:translateX(310px);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"] .in-popup{background:#1a2535}
+.in-popup.show{transform:translateX(0);display:block}
+.in-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#00b87f;display:flex;align-items:center;gap:5px;margin-bottom:8px}
+[data-theme="dark"] .in-tag{color:#00e5a0}
+.in-dot{width:6px;height:6px;border-radius:50%;background:#00e5a0;animation:pulse2 2s infinite}
+.in-num{font-size:16px;font-weight:600;color:var(--text);margin-bottom:2px}
+.in-sub{font-size:12px;color:var(--text3);margin-bottom:14px}
+.in-btns{display:flex;gap:8px}
+.btn-acc{flex:1;padding:9px;border-radius:8px;border:none;background:#00e5a0;color:#0a0e1a;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-acc:hover{background:#00c48a}
+.btn-dec{flex:1;padding:9px;border-radius:8px;border:1.5px solid #fecdd3;background:#fff1f2;color:#dc2626;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+[data-theme="dark"] .btn-dec{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.2);color:#f87171}
+.btn-dec:hover{background:#fecdd3}
+
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.v{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+@media(max-width:768px){
+  .nav-links-wrap,.nav-actions .btn-login{display:none}
+  .dialer-card{width:100%;max-width:380px}
+  .hero-inner{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="#" class="logo-link" id="logoLink">
+      <div class="logo-icon-wrap">
+        <svg class="logo-ring-outer" viewBox="0 0 40 40" style="position:absolute;inset:0;width:100%;height:100%">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#00e5a0" stroke-width="1.5" stroke-dasharray="6 4" stroke-linecap="round" class="opacity-40"/>
+        </svg>
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="13" fill="#00e5a0"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0e1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-phone" style="position:relative;z-index:10">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+      <div class="logo-text-wrap">
+        <span class="logo-ring-txt">ring</span>
+        <span class="logo-voo-txt">voo<span>.</span></span>
+      </div>
+    </a>
+
+    <div class="nav-links-wrap">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#rates" class="nav-link">Rates</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-theme" onclick="toggleTheme()">
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <button class="btn-login">Log in</button>
+      <button class="btn-start" onclick="showToast('Creating your account…','s')">Start Calling</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-blob1"></div>
+  <div class="hero-blob2"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left" style="animation:fadeUp .6s ease both">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span class="hero-badge-txt">Up to 50× Cheaper Than Traditional Carriers</span>
+      </div>
+
+      <h1 class="hero-h1">
+        Cheap International<br>
+        <span class="green">Calls</span> Directly<br>
+        <span class="dim">From Your Browser</span>
+      </h1>
+
+      <p class="hero-p">Call businesses, clients, banks, or family anywhere in the world using just your browser. No downloads, no contracts — simply pay for the minutes you use.</p>
+      <p class="hero-from">Starting from just <span>$0.02 per minute</span></p>
+
+      <div class="hero-ctas">
+        <button class="btn-hero" onclick="showToast('Creating your account…','s')">
+          <span>Call anywhere in</span>
+          <span id="flagDisplay" style="display:inline-flex;align-items:center;gap:4px;min-width:3.5rem">🇺🇸 US</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+        <span class="hero-free">✨ Your first call is <b>FREE</b></span>
+      </div>
+
+      <div class="hero-trust">
+        <div class="trust-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span>217+ countries</span>
+        </div>
+        <div class="trust-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+          <span>Encrypted calls</span>
+        </div>
+        <div class="trust-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+          <span>Instant setup</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIALER -->
+    <div class="dialer-wrap" style="animation:fadeUp .6s ease .1s both">
+      <div class="dialer-glow"></div>
+      <div class="dialer-card" id="dialerCard">
+
+        <!-- CALL OVERLAY -->
+        <div class="call-overlay" id="callOverlay">
+          <div class="rpl-wrap">
+            <div class="rpl"></div><div class="rpl"></div><div class="rpl"></div>
+            <div class="rpl-c">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="ov-num" id="ovNum">+1 555 000 0000</div>
+          <div class="ov-status" id="ovStatus">Connecting…</div>
+          <div class="ov-timer" id="ovTimer">&nbsp;</div>
+          <div class="ov-ctrls">
+            <button class="ov-ctrl" id="ovMuteBtn" onclick="toggleMute()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+            </button>
+            <button class="ov-end" onclick="hangup()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.99.4 2.05.63 3.13.69a2 2 0 0 1 2 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.31-2.59m-2.51-4.02A19.79 19.79 0 0 1 1.64 3.42 2 2 0 0 1 3.62 1.25h3a2 2 0 0 1 2 1.72c.06.58.14 1.15.25 1.71M1 1l22 22"/></svg>
+            </button>
+            <button class="ov-ctrl" id="ovSpkBtn" onclick="toggleSpeaker()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- TOP BAR -->
+        <div class="d-topbar">
+          <button class="d-go-online-btn" id="goOnlineBtn" onclick="goOnline()">
+            <span class="d-status-dot" id="statusDot"></span>
+            <span id="statusTxt">Go Online</span>
+          </button>
+          <button class="d-balance-btn">
+            <span class="d-bal-label">Balance</span>
+            <span class="d-bal-val" id="balDisplay">$0.00</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </button>
+        </div>
+
+        <!-- TABS -->
+        <div class="d-tabs-wrap">
+          <button class="d-tab active" id="tabDial" onclick="switchTab('dial')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Dial
+          </button>
+          <button class="d-tab" id="tabRecent" onclick="switchTab('recent')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Recent
+          </button>
+        </div>
+
+        <!-- DIAL PANEL -->
+        <div id="dialPanel">
+          <!-- number field -->
+          <div class="d-num-row">
+            <div class="d-num-field-wrap">
+              <button class="d-cc-btn">
+                <span class="flag">🇺🇸</span>
+                <span class="code">+1</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <input class="d-num-input" id="numInput" type="tel" placeholder="Enter phone number" readonly>
+            </div>
+          </div>
+
+          <!-- call from row -->
+          <div class="d-caller-row">
+            <span class="d-caller-label">Call from:</span>
+            <button class="d-caller-sel">
+              <span>🌐</span>
+              <span class="sel-txt">Public number</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+
+          <!-- add contact -->
+          <div class="d-add-contact">
+            <button>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+              Add contact
+            </button>
+          </div>
+
+          <!-- KEYPAD — ROUND -->
+          <div class="d-keypad">
+            <button class="d-key" onclick="kp('1')"><span class="dk-num">1</span></button>
+            <button class="d-key" onclick="kp('2')"><span class="dk-num">2</span><span class="dk-sub">ABC</span></button>
+            <button class="d-key" onclick="kp('3')"><span class="dk-num">3</span><span class="dk-sub">DEF</span></button>
+            <button class="d-key" onclick="kp('4')"><span class="dk-num">4</span><span class="dk-sub">GHI</span></button>
+            <button class="d-key" onclick="kp('5')"><span class="dk-num">5</span><span class="dk-sub">JKL</span></button>
+            <button class="d-key" onclick="kp('6')"><span class="dk-num">6</span><span class="dk-sub">MNO</span></button>
+            <button class="d-key" onclick="kp('7')"><span class="dk-num">7</span><span class="dk-sub">PQRS</span></button>
+            <button class="d-key" onclick="kp('8')"><span class="dk-num">8</span><span class="dk-sub">TUV</span></button>
+            <button class="d-key" onclick="kp('9')"><span class="dk-num">9</span><span class="dk-sub">WXYZ</span></button>
+            <button class="d-key" onclick="kp('*')"><span class="dk-num">*</span></button>
+            <button class="d-key" onclick="kp('0')"><span class="dk-num">0</span><span class="dk-sub">+</span></button>
+            <button class="d-key" onclick="kp('#')"><span class="dk-num">#</span></button>
+          </div>
+
+          <!-- BOTTOM ROW: # | BIG CALL | backspace -->
+          <div class="d-call-row">
+            <div style="display:flex;justify-content:center">
+              <button class="d-side-btn" onclick="kp('#')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>
+              </button>
+            </div>
+            <div style="display:flex;justify-content:center">
+              <button class="d-big-call-btn" id="bigCallBtn" onclick="callOrHangup()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="callBtnIcon">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </button>
+            </div>
+            <div style="display:flex;justify-content:center">
+              <button class="d-side-btn" id="backspaceBtn" onclick="bs()" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="d-rate-hint">United States · from <span>$0.02/min</span></div>
+        </div><!-- /dialPanel -->
+
+        <!-- RECENT PANEL -->
+        <div id="recentPanel" style="display:none">
+          <div class="d-recent-panel show">
+            <div class="d-r-head">Recent calls</div>
+            <div class="d-r-item" onclick="dialTo('+447700900123')"><div class="d-r-l"><div class="d-r-badge out">↗</div><div><div class="d-r-num">+44 7700 900 123</div><div class="d-r-sub">🇬🇧 United Kingdom</div></div></div><div class="d-r-meta"><div class="d-r-time">2m ago</div><div class="d-r-dur">4:12</div></div></div>
+            <div class="d-r-item" onclick="dialTo('+15559876543')"><div class="d-r-l"><div class="d-r-badge in">↙</div><div><div class="d-r-num">+1 555 987 6543</div><div class="d-r-sub">🇺🇸 United States</div></div></div><div class="d-r-meta"><div class="d-r-time">1h ago</div><div class="d-r-dur">1:48</div></div></div>
+            <div class="d-r-item" onclick="dialTo('+61412345678')"><div class="d-r-l"><div class="d-r-badge miss">✕</div><div><div class="d-r-num">+61 412 345 678</div><div class="d-r-sub">🇦🇺 Australia</div></div></div><div class="d-r-meta"><div class="d-r-time">3h ago</div><div class="d-r-dur">missed</div></div></div>
+            <div class="d-r-item" onclick="dialTo('+971501234567')"><div class="d-r-l"><div class="d-r-badge out">↗</div><div><div class="d-r-num">+971 50 123 4567</div><div class="d-r-sub">🇦🇪 UAE</div></div></div><div class="d-r-meta"><div class="d-r-time">1d ago</div><div class="d-r-dur">8:33</div></div></div>
+          </div>
+          <div class="d-r-back-row">
+            <button class="d-r-back" onclick="switchTab('dial')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              Back to dialer
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /dialer-card -->
+    </div>
+
+  </div><!-- /hero-inner -->
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="section-hiw">
+  <div class="max-w-5">
+    <div class="sec-head reveal">
+      <div class="sec-tag">How it works</div>
+      <h2 class="sec-title">Start Calling in <span class="g">3 Simple Steps</span></h2>
+    </div>
+    <div class="hiw-grid">
+      <div class="hiw-card reveal">
+        <div class="hiw-num-bg">1</div>
+        <div class="hiw-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg></div>
+        <h3 class="hiw-title">Sign Up Instantly</h3>
+        <p class="hiw-desc">Create your account in seconds with just an email. No phone verification needed.</p>
+      </div>
+      <div class="hiw-card reveal d1">
+        <div class="hiw-num-bg">2</div>
+        <div class="hiw-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></div>
+        <h3 class="hiw-title">Add Credits</h3>
+        <p class="hiw-desc">Buy credits starting at $5. Pay only for the minutes you use — no subscriptions.</p>
+      </div>
+      <div class="hiw-card reveal d2">
+        <div class="hiw-num-bg">3</div>
+        <div class="hiw-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6A5 5 0 0 1 18 10"/></svg></div>
+        <h3 class="hiw-title">Start Calling</h3>
+        <p class="hiw-desc">Dial any number worldwide directly from your browser with crystal-clear quality.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="section-feat" id="features">
+  <div class="max-w-6">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Why Ringvoo</div>
+      <h2 class="sec-title">Everything You Need to <span class="g">Stay Connected</span></h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card reveal"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div><h3 class="feat-title">217+ Countries</h3><p class="feat-desc">Call any mobile or landline worldwide with no restrictions.</p></div>
+      <div class="feat-card reveal d1"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div><h3 class="feat-title">Pay As You Go</h3><p class="feat-desc">No subscriptions. Buy credits and only pay for minutes used.</p></div>
+      <div class="feat-card reveal d2"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></div><h3 class="feat-title">Crystal Clear Audio</h3><p class="feat-desc">HD voice quality powered by enterprise-grade infrastructure.</p></div>
+      <div class="feat-card reveal"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></div><h3 class="feat-title">Encrypted &amp; Secure</h3><p class="feat-desc">All calls are end-to-end encrypted. Your privacy matters.</p></div>
+      <div class="feat-card reveal d1"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h3 class="feat-title">SMS Worldwide</h3><p class="feat-desc">Send text messages to any phone number globally.</p></div>
+      <div class="feat-card reveal d2"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div><h3 class="feat-title">No App Required</h3><p class="feat-desc">Call directly from your browser on any device.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRICING ═══ -->
+<section class="section-price" id="pricing">
+  <div class="max-w-5">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Simple Pricing</div>
+      <h2 class="sec-title">Buy Credits, <span class="g">Pay As You Go</span></h2>
+    </div>
+    <div class="price-grid reveal">
+      <div class="price-card"><div class="price-amt">$5</div><div class="price-sub">~250 min to US</div><button class="price-btn" onclick="showToast('Redirecting to checkout…','i')">Buy Credits</button></div>
+      <div class="price-card"><div class="price-amt">$10</div><div class="price-bonus">+$1 free</div><div class="price-sub">~550 min to US</div><button class="price-btn" onclick="showToast('Redirecting to checkout…','i')">Buy Credits</button></div>
+      <div class="price-card hot">
+        <div class="price-hot-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>BEST VALUE</div>
+        <div class="price-amt">$25</div><div class="price-bonus">+$5 free</div><div class="price-sub">~1,500 min to US</div>
+        <button class="price-btn" onclick="showToast('Redirecting to checkout…','i')">Buy Credits</button>
+      </div>
+      <div class="price-card"><div class="price-amt">$50</div><div class="price-bonus">+$15 free</div><div class="price-sub">~3,250 min to US</div><button class="price-btn" onclick="showToast('Redirecting to checkout…','i')">Buy Credits</button></div>
+    </div>
+    <div class="price-perks reveal">
+      <div class="price-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>No subscription required</div>
+      <div class="price-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Credits never expire</div>
+      <div class="price-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Call 217+ countries</div>
+      <div class="price-perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>SMS included</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RATES ═══ -->
+<section class="section-rates" id="rates">
+  <div class="max-w-3">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Transparent Rates</div>
+      <h2 class="sec-title">Check Your <span class="g">Call Rates</span></h2>
+    </div>
+    <div class="rates-box reveal d1">
+      <label class="rates-label">I'm calling</label>
+      <div class="rates-sel-wrap">
+        <button class="rates-trigger" onclick="toggleRatesDropdown()">
+          <div class="rates-trigger-l">
+            <span class="rates-flag" id="ratesFlag">🇺🇸</span>
+            <span class="rates-country" id="ratesCountry">United States</span>
+          </div>
+          <svg class="rates-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="rates-dropdown" id="ratesDropdown">
+          <div class="rates-opt" onclick="selectCountry('🇺🇸','United States','$0.02','$0.01')"><span class="flag">🇺🇸</span>United States</div>
+          <div class="rates-opt" onclick="selectCountry('🇬🇧','United Kingdom','$0.02','$0.01')"><span class="flag">🇬🇧</span>United Kingdom</div>
+          <div class="rates-opt" onclick="selectCountry('🇦🇺','Australia','$0.04','$0.02')"><span class="flag">🇦🇺</span>Australia</div>
+          <div class="rates-opt" onclick="selectCountry('🇩🇪','Germany','$0.02','$0.01')"><span class="flag">🇩🇪</span>Germany</div>
+          <div class="rates-opt" onclick="selectCountry('🇫🇷','France','$0.03','$0.01')"><span class="flag">🇫🇷</span>France</div>
+          <div class="rates-opt" onclick="selectCountry('🇮🇳','India','$0.01','$0.01')"><span class="flag">🇮🇳</span>India</div>
+          <div class="rates-opt" onclick="selectCountry('🇳🇬','Nigeria','$0.08','$0.06')"><span class="flag">🇳🇬</span>Nigeria</div>
+          <div class="rates-opt" onclick="selectCountry('🇦🇪','UAE','$0.05','$0.04')"><span class="flag">🇦🇪</span>UAE</div>
+          <div class="rates-opt" onclick="selectCountry('🇯🇵','Japan','$0.04','$0.02')"><span class="flag">🇯🇵</span>Japan</div>
+          <div class="rates-opt" onclick="selectCountry('🇨🇦','Canada','$0.02','$0.01')"><span class="flag">🇨🇦</span>Canada</div>
+          <div class="rates-opt" onclick="selectCountry('🇧🇷','Brazil','$0.06','$0.03')"><span class="flag">🇧🇷</span>Brazil</div>
+          <div class="rates-opt" onclick="selectCountry('🇲🇽','Mexico','$0.03','$0.02')"><span class="flag">🇲🇽</span>Mexico</div>
+          <div class="rates-opt" onclick="selectCountry('🇿🇦','South Africa','$0.07','$0.05')"><span class="flag">🇿🇦</span>South Africa</div>
+          <div class="rates-opt" onclick="selectCountry('🇵🇰','Pakistan','$0.03','$0.02')"><span class="flag">🇵🇰</span>Pakistan</div>
+          <div class="rates-opt" onclick="selectCountry('🇬🇭','Ghana','$0.09','$0.07')"><span class="flag">🇬🇭</span>Ghana</div>
+        </div>
+      </div>
+      <div class="rates-cols">
+        <div class="rate-box">
+          <div class="rate-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Mobile</div>
+          <p class="rate-val"><span id="rMobile">$0.02</span><small>/min</small></p>
+        </div>
+        <div class="rate-box">
+          <div class="rate-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>Landline</div>
+          <p class="rate-val"><span id="rLandline">$0.01</span><small>/min</small></p>
+        </div>
+      </div>
+      <p class="rates-note">Rates shown are per minute. Billed per second after the first minute.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="section-testi">
+  <div class="max-w-6">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Trusted Worldwide</div>
+      <h2 class="sec-title">What Our <span class="g">Users Say</span></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+        </div>
+        <p class="testi-text">"I travel constantly for work and Ringvoo saves me hundreds every month. The call quality is incredible — better than most apps I've tried."</p>
+        <div class="testi-author"><div class="testi-av">SM</div><div><div class="testi-name">Sarah Mitchell</div><div class="testi-loc">Bangkok, Thailand</div></div></div>
+      </div>
+      <div class="testi-card reveal d1">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+        </div>
+        <p class="testi-text">"I call my family in Colombia every week. Ringvoo is so much cheaper than my phone carrier, and I don't even need to install anything."</p>
+        <div class="testi-author"><div class="testi-av">CR</div><div><div class="testi-name">Carlos Rodriguez</div><div class="testi-loc">Toronto, Canada</div></div></div>
+      </div>
+      <div class="testi-card reveal d2">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+        </div>
+        <p class="testi-text">"Needed to urgently call my bank back home while abroad. Ringvoo got me connected in seconds. Absolute lifesaver for expats."</p>
+        <div class="testi-author"><div class="testi-av">EL</div><div><div class="testi-name">Emma Larsson</div><div class="testi-loc">Berlin, Germany</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="section-faq" id="faq">
+  <div class="max-w-3">
+    <div class="sec-head reveal">
+      <div class="sec-tag">FAQ</div>
+      <h2 class="sec-title">Frequently Asked <span class="g">Questions</span></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">How does browser-based calling work?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">Ringvoo uses WebRTC technology to route calls through your browser's microphone directly to any phone number worldwide. It works just like a regular phone call — you dial a number and the other person's phone rings, even if they don't have Ringvoo.</div></div></div>
+      <div class="faq-item reveal d1"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">Do I need a phone number to sign up?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">No. You only need an email address to create your account. You can optionally verify your own phone number later to use it as a custom caller ID.</div></div></div>
+      <div class="faq-item reveal d2"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">Do my credits expire?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">Never. Credits stay in your account indefinitely. No monthly fees or usage requirements.</div></div></div>
+      <div class="faq-item reveal d3"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">Can I receive calls too?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">Yes. When you are online in the Ringvoo app, inbound calls ring directly in your browser with an animated popup.</div></div></div>
+      <div class="faq-item reveal d4"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">What about call quality?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">Ringvoo uses Twilio's enterprise-grade global voice network with the Opus codec for HD audio. Typically better than a regular mobile call with a good internet connection.</div></div></div>
+      <div class="faq-item reveal"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">Can I set my own Caller ID?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">Yes. In Settings you can verify any phone number you own by receiving a call with a 6-digit OTP. Once verified, that number shows as your caller ID.</div></div></div>
+      <div class="faq-item reveal d1"><button class="faq-q" onclick="faqToggle(this)"><span class="faq-q-txt">Is there a subscription or monthly fee?</span><svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div class="faq-a-inner">None at all. Ringvoo is purely pay-as-you-go. No hidden fees, no monthly charges, no contracts.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="section-cta">
+  <div class="cta-glow"></div>
+  <div class="max-w-3" style="text-align:center;position:relative">
+    <div class="reveal">
+      <div class="cta-phone-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <h2 class="cta-title">Ready to Make Your<br><span class="g">First Call?</span></h2>
+      <p class="cta-sub">Join thousands of travellers and businesses saving money on international calls.</p>
+      <button class="btn-cta-big" onclick="showToast('Creating your account…','s')">
+        Start Calling Now
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <p class="cta-note">No credit card required • First call free • Setup in 60 seconds</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo-link">
+          <div class="logo-icon-wrap">
+            <svg class="logo-ring-outer" viewBox="0 0 40 40" style="position:absolute;inset:0;width:100%;height:100%">
+              <circle cx="20" cy="20" r="18" fill="none" stroke="#00e5a0" stroke-width="1.5" stroke-dasharray="6 4" stroke-linecap="round" style="opacity:.4"/>
+            </svg>
+            <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="#00e5a0"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0e1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:10"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="logo-text-wrap">
+            <span class="logo-ring-txt">ring</span>
+            <span class="logo-voo-txt">voo<span>.</span></span>
+          </div>
+        </a>
+        <p class="foot-desc">Make affordable international calls from your browser. No apps, no contracts, no hassle.</p>
+      </div>
+      <div class="foot-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Pricing</a></li><li><a href="#">Rates</a></li><li><a href="#">SMS</a></li><li><a href="#">Business</a></li></ul></div>
+      <div class="foot-col"><h4>Support</h4><ul><li><a href="#">Help Center</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Status</a></li><li><a href="#">API Docs</a></li></ul></div>
+      <div class="foot-col"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Cookie Policy</a></li></ul></div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© 2026 Ringvoo. All rights reserved.</p>
+      <div class="foot-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"><div class="tdot" id="tDot"></div><span id="tMsg"></span></div>
+
+<!-- INCOMING -->
+<div class="in-popup" id="inPopup">
+  <div class="in-tag"><span class="in-dot"></span>Incoming call</div>
+  <div class="in-num">+44 7700 900 888</div>
+  <div class="in-sub">United Kingdom · Mobile</div>
+  <div class="in-btns"><button class="btn-acc" onclick="acceptCall()">Accept</button><button class="btn-dec" onclick="declineCall()">Decline</button></div>
+</div>
+
+<script>
+const BACKEND_URL = 'http://localhost:3001';
+
+// ── theme ──────────────────────────────────────────
+function toggleTheme(){
+  const d=document.documentElement;
+  const dk=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dk?'light':'dark');
+  localStorage.setItem('rvt',dk?'light':'dark');
+}
+(()=>{const t=localStorage.getItem('rvt');if(t)document.documentElement.setAttribute('data-theme',t)})();
+
+// ── nav scroll ─────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>20);
+});
+
+// ── flag cycle ─────────────────────────────────────
+const flags=[{e:'🇺🇸',c:'US'},{e:'🇬🇧',c:'GB'},{e:'🇦🇺',c:'AU'},{e:'🇳🇬',c:'NG'},{e:'🇧🇷',c:'BR'},{e:'🇯🇵',c:'JP'},{e:'🇩🇪',c:'DE'},{e:'🇦🇪',c:'AE'},{e:'🇮🇳',c:'IN'}];
+let fi=0;
+setInterval(()=>{fi=(fi+1)%flags.length;const f=flags[fi];document.getElementById('flagDisplay').innerHTML=`${f.e} ${f.c}`},2000);
+
+// ── dialer state ───────────────────────────────────
+let num='',device=null,activeCall=null,timerInt=null,timerSec=0,isOnline=false,isMuted=false,pending=null,inCall=false;
+
+// ── tab switch ─────────────────────────────────────
+function switchTab(tab){
+  document.getElementById('tabDial').classList.toggle('active',tab==='dial');
+  document.getElementById('tabRecent').classList.toggle('active',tab==='recent');
+  document.getElementById('dialPanel').style.display=tab==='dial'?'block':'none';
+  document.getElementById('recentPanel').style.display=tab==='recent'?'block':'none';
+}
+
+// ── keypad ─────────────────────────────────────────
+function kp(k){if(num.length>=20)return;num+=k;renderNum()}
+function bs(){num=num.slice(0,-1);renderNum()}
+function dialTo(n){num=n;renderNum();switchTab('dial');document.querySelector('.dialer-card').scrollIntoView({behavior:'smooth',block:'center'})}
+
+function renderNum(){
+  document.getElementById('numInput').value=num;
+  const bsBtn=document.getElementById('backspaceBtn');
+  if(bsBtn)bsBtn.disabled=!num;
+  updateCallBtn();
+}
+
+function updateCallBtn(){
+  const btn=document.getElementById('bigCallBtn');
+  if(inCall){
+    btn.className='d-big-call-btn calling';
+    document.getElementById('callBtnIcon').innerHTML='<path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.99.4 2.05.63 3.13.69a2 2 0 0 1 2 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.31-2.59m-2.51-4.02A19.79 19.79 0 0 1 1.64 3.42 2 2 0 0 1 3.62 1.25h3a2 2 0 0 1 2 1.72c.06.58.14 1.15.25 1.71M1 1l22 22"/>';
+  } else if(isOnline&&num){
+    btn.className='d-big-call-btn ready';
+    document.getElementById('callBtnIcon').innerHTML='<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>';
+  } else {
+    btn.className='d-big-call-btn';
+    document.getElementById('callBtnIcon').innerHTML='<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>';
+  }
+}
+
+function callOrHangup(){
+  if(inCall){hangup();return}
+  if(!isOnline){showToast('Go online first to make a call','e');return}
+  if(!num){showToast('Enter a number to call','e');return}
+  makeCall();
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.activeElement.id==='numInput')return;
+  if('0123456789*#'.includes(e.key)){kp(e.key);return}
+  if(e.key==='+'){kp('+');return}
+  if(e.key==='Backspace'){e.preventDefault();bs();return}
+  if(e.key==='Enter')callOrHangup();
+});
+
+document.getElementById('numInput').addEventListener('input',function(){
+  num=this.value.replace(/[^0-9+*#]/g,'');
+  this.value=num;
+  updateCallBtn();
+});
+
+// ── go online ──────────────────────────────────────
+async function goOnline(){
+  const btn=document.getElementById('goOnlineBtn');
+  if(isOnline){
+    device&&device.destroy();device=null;
+    setOfflineUI();showToast('You are now offline.','i');return;
+  }
+  btn.querySelector('span:last-child').textContent='Connecting…';
+  btn.disabled=true;
+  try{
+    const r=await fetch(`${BACKEND_URL}/token?identity=user_${Date.now()}`);
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    device=new Twilio.Device(d.token,{codecPreferences:['opus','pcmu'],enableRingingState:true});
+    device.on('ready',()=>{setOnlineUI();showToast("You're live! Ready to call.",'s');fetchBal()});
+    device.on('error',err=>{showToast('Error: '+err.message,'e');setOfflineUI()});
+    device.on('disconnect',endCallUI);
+    device.on('incoming',handleIn);
+  }catch(_){
+    showToast('Cannot connect — is the backend running?','e');
+    btn.querySelector('span:last-child').textContent='Go Online';
+    btn.disabled=false;
+  }
+}
+function setOnlineUI(){
+  isOnline=true;
+  const btn=document.getElementById('goOnlineBtn');
+  btn.disabled=false;
+  btn.classList.add('online');
+  document.getElementById('statusDot').className='d-status-dot online';
+  document.getElementById('statusTxt').textContent='Online';
+  updateCallBtn();
+}
+function setOfflineUI(){
+  isOnline=false;
+  const btn=document.getElementById('goOnlineBtn');
+  btn.disabled=false;
+  btn.classList.remove('online');
+  document.getElementById('statusDot').className='d-status-dot';
+  document.getElementById('statusTxt').textContent='Go Online';
+  updateCallBtn();
+}
+
+// ── make call ──────────────────────────────────────
+function makeCall(){
+  if(!device||!num)return;
+  activeCall=device.connect({To:num});
+  activeCall.on('ringing',()=>showCallOv(num,'Ringing…'));
+  activeCall.on('accept',()=>{document.getElementById('ovStatus').textContent='Connected';startTimer()});
+  activeCall.on('disconnect',endCallUI);
+  activeCall.on('error',e=>{showToast('Call error: '+e.message,'e');endCallUI()});
+  inCall=true;updateCallBtn();
+  showCallOv(num,'Connecting…');
+}
+function hangup(){activeCall?activeCall.disconnect():device&&device.disconnectAll();endCallUI()}
+function showCallOv(n,s){
+  document.getElementById('ovNum').textContent=n;
+  document.getElementById('ovStatus').textContent=s;
+  document.getElementById('ovTimer').innerHTML='&nbsp;';
+  document.getElementById('callOverlay').classList.add('show');
+}
+function endCallUI(){
+  inCall=false;
+  document.getElementById('callOverlay').classList.remove('show');
+  stopTimer();
+  if(isOnline)fetchBal();
+  updateCallBtn();
+}
+function startTimer(){
+  timerSec=0;
+  timerInt=setInterval(()=>{
+    timerSec++;
+    const m=String(Math.floor(timerSec/60)).padStart(2,'0'),s=String(timerSec%60).padStart(2,'0');
+    document.getElementById('ovTimer').textContent=m+':'+s;
+  },1000);
+}
+function stopTimer(){clearInterval(timerInt);timerSec=0}
+function toggleMute(){if(!activeCall)return;isMuted=!isMuted;activeCall.mute(isMuted);document.getElementById('ovMuteBtn').classList.toggle('active',isMuted)}
+function toggleSpeaker(){document.getElementById('ovSpkBtn').classList.toggle('active')}
+
+// ── incoming ───────────────────────────────────────
+function handleIn(c){pending=c;const p=document.getElementById('inPopup');p.style.display='block';requestAnimationFrame(()=>p.classList.add('show'))}
+function acceptCall(){if(!pending)return;pending.accept();activeCall=pending;pending=null;hideIn();inCall=true;showCallOv(activeCall.parameters.From||'Caller','Connected');startTimer();updateCallBtn()}
+function declineCall(){pending&&pending.reject();pending=null;hideIn()}
+function hideIn(){const p=document.getElementById('inPopup');p.classList.remove('show');setTimeout(()=>p.style.display='none',400)}
+
+// ── balance ────────────────────────────────────────
+async function fetchBal(){
+  try{const r=await fetch(`${BACKEND_URL}/account/balance`);if(!r.ok)return;const d=await r.json();document.getElementById('balDisplay').textContent='$'+parseFloat(d.balance).toFixed(2)}catch(_){}
+}
+
+// ── toast ──────────────────────────────────────────
+let tt;
+function showToast(msg,type='i'){
+  clearTimeout(tt);
+  document.getElementById('tDot').className='tdot '+type;
+  document.getElementById('tMsg').textContent=msg;
+  const el=document.getElementById('toastEl');
+  el.classList.add('show');
+  tt=setTimeout(()=>el.classList.remove('show'),3400);
+}
+
+// ── rates dropdown ─────────────────────────────────
+function toggleRatesDropdown(){document.getElementById('ratesDropdown').classList.toggle('open')}
+function selectCountry(flag,name,mobile,landline){
+  document.getElementById('ratesFlag').textContent=flag;
+  document.getElementById('ratesCountry').textContent=name;
+  document.getElementById('rMobile').textContent=mobile;
+  document.getElementById('rLandline').textContent=landline;
+  document.getElementById('ratesDropdown').classList.remove('open');
+  // try live API
+  const isoMap={'United States':'US','United Kingdom':'GB','Australia':'AU','Germany':'DE','France':'FR','India':'IN','Nigeria':'NG','UAE':'AE','Japan':'JP','Canada':'CA','Brazil':'BR','Mexico':'MX','South Africa':'ZA','Pakistan':'PK','Ghana':'GH'};
+  const iso=isoMap[name];
+  if(iso){
+    fetch(`${BACKEND_URL}/rates/country/${iso}`)
+      .then(r=>r.json())
+      .then(d=>{if(d.mobile)document.getElementById('rMobile').textContent=d.mobile;if(d.landline)document.getElementById('rLandline').textContent=d.landline})
+      .catch(()=>{});
+  }
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.rates-sel-wrap'))document.getElementById('ratesDropdown').classList.remove('open')});
+
+// ── faq ────────────────────────────────────────────
+function faqToggle(btn){const item=btn.closest('.faq-item');const open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open')}
+
+// ── scroll reveal ──────────────────────────────────
+const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('v');io.unobserve(x.target)}})},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
