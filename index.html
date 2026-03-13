@@ -263,8 +263,20 @@ nav.scrolled{
   cursor:pointer;
 }
 [data-theme="dark"] .d-cc-btn{border-right-color:rgba(255,255,255,.1)}
-.d-cc-btn .flag{font-size:20px}
-.d-cc-btn .code{font-size:14px;font-weight:500;color:var(--text2)}
+.d-cc-btn .flag{
+  display:flex;
+  align-items:center;
+  font-size:20px;
+  line-height:1;
+}
+.d-cc-btn .code{
+  display:flex;
+  align-items:center;
+  font-size:14px;
+  font-weight:500;
+  color:var(--text2);
+  line-height:1;
+}
 .d-cc-btn svg{width:12px;height:12px;color:var(--text3)}
 
 .d-cc-dropdown{
@@ -295,8 +307,22 @@ nav.scrolled{
   color:var(--text);
   transition:background .15s;
 }
-.d-cc-opt .flag{font-size:18px}
-.d-cc-opt small{color:var(--text3);margin-left:auto}
+.d-cc-opt *{
+  line-height:1;
+}
+.d-cc-opt .flag{
+  font-size:18px;
+}
+.d-cc-opt span{
+  display:flex;
+  align-items:center;
+}
+.d-cc-opt small{
+  display:flex;
+  align-items:center;
+  color:var(--text3);
+  margin-left:auto;
+}
 .d-cc-opt:hover{background:var(--bg2)}
 [data-theme="dark"] .d-cc-opt:hover{background:rgba(255,255,255,.05)}
 
@@ -315,6 +341,27 @@ nav.scrolled{
 .d-num-input::placeholder{color:var(--text4)}
 [data-theme="dark"] .d-num-input{color:#ffffff}
 [data-theme="dark"] .d-num-input::placeholder{color:rgba(255,255,255,.2)}
+
+.d-num-clear{
+  flex-shrink:0;
+  width:24px;
+  height:24px;
+  border-radius:999px;
+  border:none;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg3);
+  color:var(--text3);
+  cursor:pointer;
+  margin-left:8px;
+  font-size:14px;
+  line-height:1;
+}
+.d-num-clear:hover{
+  background:var(--bg4);
+  color:var(--text2);
+}
 
 /* caller row */
 .d-caller-row{margin:0 20px 10px;display:flex;align-items:center;gap:12px}
@@ -546,7 +593,11 @@ nav.scrolled{
 .modal-btn-primary:hover{background:#00ffb0}
 
 /* add contact */
-.d-add-contact{display:flex;justify-content:center;margin-bottom:10px;margin-top:4px}
+.d-add-contact{
+  display:flex;
+  justify-content:flex-start;
+  margin:4px 20px 10px 20px;
+}
 .d-add-contact button{
   display:flex;align-items:center;gap:6px;
   font-size:12px;
@@ -571,7 +622,12 @@ nav.scrolled{
 .d-key:hover{background:var(--bg3);box-shadow:0 2px 8px rgba(0,0,0,.1)}
 [data-theme="dark"] .d-key:hover{background:rgba(255,255,255,.08)}
 .d-key:active{transform:scale(.92);box-shadow:none}
-.dk-num{font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.dk-num{
+  font-size:22px;
+  font-weight:600;
+  color:var(--text2);
+  line-height:1;
+}
 .dk-sub{
   font-size:11px;
   font-weight:600;
@@ -579,6 +635,20 @@ nav.scrolled{
   color:var(--text2);
   margin-top:3px;
   text-transform:uppercase;
+}
+
+/* visual mode hint on keypad */
+.d-keypad.numeric-mode .dk-num{color:var(--text);}
+.d-keypad.numeric-mode .dk-sub{color:var(--text3);}
+.d-keypad.alpha-mode .dk-num{color:var(--text3);}
+.d-keypad.alpha-mode .dk-sub{color:var(--text);}
+
+/* make * and # as big as digits */
+.d-keypad .d-key-star .dk-num,
+.d-keypad .d-key-hash .dk-num{
+  font-size:32px; /* visually match 0 width */
+  font-weight:700;
+  line-height:1;
 }
 
 /* bottom call row */
@@ -595,6 +665,11 @@ nav.scrolled{
   font-size:11px;
   font-weight:600;
 }
+[id="modeToggleBtn"]{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.08em;
+}
 [data-theme="dark"] .d-side-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
 .d-side-btn:hover{background:var(--bg3);color:var(--text2)}
 [data-theme="dark"] .d-side-btn:hover{background:rgba(255,255,255,.08)}
@@ -602,21 +677,36 @@ nav.scrolled{
 .d-side-btn.active{border-color:#00e5a0;color:#00b87f;background:rgba(0,229,160,.1)}
 [data-theme="dark"] .d-side-btn.active{color:#00e5a0}
 
+.d-side-btn.cancel-btn{
+  /* keep cancel clearly visible but match light gray border */
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text2);
+}
+[data-theme="dark"] .d-side-btn.cancel-btn{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.15);
+  color:var(--text);
+}
+.d-side-btn.cancel-btn:disabled{
+  opacity:1;
+}
+
 .d-big-call-btn{
   width:72px;height:72px;border-radius:50%;
   display:grid;place-items:center;
-  border:none;cursor:pointer;transition:all .3s;
-  background:#d1d5db;/* disabled state */
+  border:none;
+  cursor:pointer;transition:all .3s;
+  background:#00e5a0;
 }
-[data-theme="dark"] .d-big-call-btn{background:rgba(255,255,255,.1)}
-.d-big-call-btn.ready{background:#00e5a0;box-shadow:0 8px 24px rgba(0,229,160,.4)}
-.d-big-call-btn.ready:hover{background:#00ffb0;transform:scale(1.06)}
+[data-theme="dark"] .d-big-call-btn{background:#00e5a0}
+.d-big-call-btn.ready{box-shadow:0 8px 24px rgba(0,229,160,.4)}
+.d-big-call-btn.ready:hover{transform:scale(1.06)}
 .d-big-call-btn.calling{background:#ef4444;box-shadow:0 8px 24px rgba(239,68,68,.4)}
 .d-big-call-btn.calling:hover{background:#dc2626;transform:scale(1.06)}
-.d-big-call-btn svg{width:28px;height:28px;color:var(--text3)}
-.d-big-call-btn.ready svg,.d-big-call-btn.calling svg{color:#0a0e1a}
-[data-theme="dark"] .d-big-call-btn svg{color:rgba(255,255,255,.3)}
-[data-theme="dark"] .d-big-call-btn.ready svg,[data-theme="dark"] .d-big-call-btn.calling svg{color:#0a0e1a}
+.d-big-call-btn svg{width:28px;height:28px;color:#020617}
+.d-big-call-btn.calling svg{color:#f9fafb}
+[data-theme="dark"] .d-big-call-btn svg{color:#020617}
 
 /* rate hint */
 .d-rate-hint{
@@ -1119,7 +1209,8 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
                   </div>
                 </div>
               </div>
-              <input class="d-num-input" id="numInput" type="tel" placeholder="Enter phone number" readonly>
+              <input class="d-num-input" id="numInput" type="tel" placeholder="Enter phone number">
+              <button class="d-num-clear" id="clearNumBtn" type="button" onclick="clearNum()" aria-label="Clear number">✕</button>
             </div>
           </div>
 
@@ -1134,12 +1225,12 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
               </button>
               <div class="d-caller-dropdown" id="callerDropdown">
                 <div class="d-caller-section-label">Custom caller IDs</div>
-                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                <div class="d-caller-opt" onclick="selectVerifiedCaller('+1 815 367 8725')">
                   <span>🇺🇸</span>
                   <span>+1 815 367 8725</span>
                   <span class="d-caller-pill">Verified</span>
                 </div>
-                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                <div class="d-caller-opt" onclick="selectVerifiedCaller('+971 52 745 9432')">
                   <span>🇦🇪</span>
                   <span>+971 52 745 9432</span>
                   <span class="d-caller-pill">Verified</span>
@@ -1149,7 +1240,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
                   <div class="d-caller-opt-icon">🌐</div>
                   <span>Public number</span>
                 </div>
-                <div class="d-caller-opt" onclick="selectCallerProfile('customer')">
+                <div class="d-caller-opt" onclick="selectCallerProfile('custom')">
                   <div class="d-caller-opt-icon">👤</div>
                   <span>Custom caller ID</span>
                   <span class="d-caller-pill">FREE</span>
@@ -1172,7 +1263,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
           </div>
 
           <!-- KEYPAD — ROUND -->
-          <div class="d-keypad">
+          <div class="d-keypad numeric-mode">
             <button class="d-key" onclick="kp('1')"><span class="dk-num">1</span></button>
             <button class="d-key" onclick="kp('2')"><span class="dk-num">2</span><span class="dk-sub">ABC</span></button>
             <button class="d-key" onclick="kp('3')"><span class="dk-num">3</span><span class="dk-sub">DEF</span></button>
@@ -1182,15 +1273,15 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
             <button class="d-key" onclick="kp('7')"><span class="dk-num">7</span><span class="dk-sub">PQRS</span></button>
             <button class="d-key" onclick="kp('8')"><span class="dk-num">8</span><span class="dk-sub">TUV</span></button>
             <button class="d-key" onclick="kp('9')"><span class="dk-num">9</span><span class="dk-sub">WXYZ</span></button>
-            <button class="d-key" onclick="kp('*')"><span class="dk-num">*</span></button>
+            <button class="d-key d-key-star" onclick="kp('*')"><span class="dk-num">*</span></button>
             <button class="d-key" onclick="kp('0')"><span class="dk-num">0</span><span class="dk-sub">+</span></button>
-            <button class="d-key" onclick="kp('#')"><span class="dk-num">#</span></button>
+            <button class="d-key d-key-hash" onclick="kp('#')"><span class="dk-num">#</span></button>
           </div>
 
           <!-- BOTTOM ROW: # | BIG CALL | backspace -->
           <div class="d-call-row">
             <div style="display:flex;justify-content:center">
-              <button class="d-side-btn" id="modeToggleBtn" type="button" onclick="toggleInputMode()">ABC</button>
+              <button class="d-side-btn" id="modeToggleBtn" type="button" onclick="toggleInputMode()">123</button>
             </div>
             <div style="display:flex;justify-content:center">
               <button class="d-big-call-btn" id="bigCallBtn" onclick="callOrHangup()">
@@ -1200,7 +1291,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
               </button>
             </div>
             <div style="display:flex;justify-content:center">
-              <button class="d-side-btn" id="backspaceBtn" onclick="bs()" disabled>
+              <button class="d-side-btn cancel-btn" id="backspaceBtn" onclick="bs()" disabled>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>
               </button>
             </div>
@@ -1355,7 +1446,7 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
           <p class="rate-val"><span id="rLandline">$0.01</span><small>/min</small></p>
         </div>
       </div>
-      <p class="rates-note">Rates shown are per minute. Billed per second after the first minute.</p>
+      <p class="rates-note">Rates shown are per minute. Any partial minute is rounded up to the next full minute for billing.</p>
     </div>
   </div>
 </section>
@@ -1498,24 +1589,29 @@ footer{background:var(--bg3);border-top:1px solid var(--border);padding:80px 0;t
 </div>
 
 <!-- ADD CONTACT MODAL -->
-<div class="call-overlay" id="contactModal" style="position:fixed;inset:auto 16px 16px auto;width:320px;align-items:stretch;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <h3 style="font-size:15px;font-weight:700;color:var(--text);">Add contact</h3>
-    <button type="button" onclick="closeContactModal()" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:14px;">✕</button>
+<div class="modal-backdrop" id="contactModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Add contact</div>
+      <button class="modal-close-btn" type="button" onclick="closeContactModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveContact(event)" style="width:100%;display:flex;flex-direction:column;gap:10px;">
+        <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
+          Name
+          <input id="contactName" type="text" placeholder="e.g. Sarah (Bank)" class="modal-input">
+        </label>
+        <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
+          Number
+          <input id="contactNumber" type="text" placeholder="+1 555 000 0000" class="modal-input">
+        </label>
+        <div class="modal-footer">
+          <button class="modal-btn" type="button" onclick="closeContactModal()">Cancel</button>
+          <button class="modal-btn modal-btn-primary" type="submit">Save &amp; use number</button>
+        </div>
+      </form>
+    </div>
   </div>
-  <form onsubmit="saveContact(event)" style="width:100%;display:flex;flex-direction:column;gap:10px;">
-    <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
-      Name
-      <input id="contactName" type="text" placeholder="e.g. Sarah (Bank)" style="border-radius:10px;border:1px solid var(--border);padding:8px 10px;font-size:13px;background:var(--bg2);color:var(--text);outline:none;">
-    </label>
-    <label style="font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:4px;">
-      Number
-      <input id="contactNumber" type="text" placeholder="+1 555 000 0000" style="border-radius:10px;border:1px solid var(--border);padding:8px 10px;font-size:13px;background:var(--bg2);color:var(--text);outline:none;">
-    </label>
-    <button type="submit" style="margin-top:4px;padding:10px 12px;border-radius:12px;border:none;background:#00e5a0;color:#0a0e1a;font-weight:600;font-size:14px;cursor:pointer;">
-      Save &amp; use number
-    </button>
-  </form>
 </div>
 
 <!-- CUSTOM CALLER ID MODAL -->
@@ -1661,15 +1757,46 @@ function switchTab(tab){
   document.getElementById('recentPanel').style.display=tab==='recent'?'block':'none';
 }
 
+const alphaMap={
+  '2':'ABC','3':'DEF','4':'GHI','5':'JKL','6':'MNO','7':'PQRS','8':'TUV','9':'WXYZ'
+};
+let lastAlphaKey=null;
+let lastAlphaTime=0;
+
 // ── keypad ─────────────────────────────────────────
-function kp(k){if(num.length>=20)return;num+=k;renderNum()}
+function kp(k){
+  if(num.length>=20)return;
+  if(inputMode==='alpha' && alphaMap[k]){
+    const now=Date.now();
+    const group=alphaMap[k];
+    // if same key pressed again within 1.2s, rotate last letter
+    if(lastAlphaKey===k && now-lastAlphaTime<1200 && num.length){
+      const current=num[num.length-1];
+      const idx=group.indexOf(current);
+      const next=group[(idx+1+group.length)%group.length]||group[0];
+      num=num.slice(0,-1)+next;
+    }else{
+      num+=group[0];
+    }
+    lastAlphaKey=k;
+    lastAlphaTime=now;
+    renderNum();
+    return;
+  }
+  num+=k;
+  renderNum();
+}
 function bs(){num=num.slice(0,-1);renderNum()}
+function clearNum(){num='';renderNum()}
 function dialTo(n){num=n;renderNum();switchTab('dial');document.querySelector('.dialer-card').scrollIntoView({behavior:'smooth',block:'center'})}
 
 function renderNum(){
-  document.getElementById('numInput').value=num;
+  const input=document.getElementById('numInput');
+  if(input)input.value=num;
   const bsBtn=document.getElementById('backspaceBtn');
   if(bsBtn)bsBtn.disabled=!num;
+  const clearBtn=document.getElementById('clearNumBtn');
+  if(clearBtn)clearBtn.style.display=num?'inline-flex':'none';
   updateCallBtn();
 }
 
@@ -1695,15 +1822,18 @@ function callOrHangup(){
 }
 
 document.addEventListener('keydown',e=>{
-  if(document.activeElement.id==='numInput')return;
-  if('0123456789*#'.includes(e.key)){kp(e.key);return}
-  if(e.key==='+'){kp('+');return}
+  const t=e.target;
+  const isEditable=t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable;
+  // Global shortcuts only when not typing in any input/textarea/contentEditable
+  if(isEditable)return;
   if(inputMode==='alpha' && /^[a-zA-Z]$/.test(e.key)){
     if(num.length>=20)return;
     num+=e.key.toUpperCase();
     renderNum();
     return;
   }
+  if('0123456789*#'.includes(e.key)){kp(e.key);return}
+  if(e.key==='+'){kp('+');return}
   if(e.key==='Backspace'){e.preventDefault();bs();return}
   if(e.key==='Enter')callOrHangup();
 });
@@ -1712,13 +1842,20 @@ document.getElementById('numInput').addEventListener('input',function(){
   const re=inputMode==='alpha'?/[^0-9+*#A-Za-z]/g:/[^0-9+*#]/g;
   num=this.value.replace(re,'');
   this.value=num;
-  updateCallBtn();
+  renderNum();
 });
 
 function toggleInputMode(){
   inputMode=inputMode==='num'?'alpha':'num';
   const btn=document.getElementById('modeToggleBtn');
-  btn.textContent=inputMode==='num'?'ABC':'123';
+  // Show the *current* input mode: 123 = numeric, ABC = alphabetic
+  btn.textContent=inputMode==='num'?'123':'ABC';
+  btn.classList.toggle('active',inputMode==='alpha');
+  const kp=document.querySelector('.d-keypad');
+  if(kp){
+    kp.classList.toggle('alpha-mode',inputMode==='alpha');
+    kp.classList.toggle('numeric-mode',inputMode==='num');
+  }
 }
 
 function toggleCcDropdown(){
@@ -1740,20 +1877,28 @@ function toggleCallerDropdown(){
   document.getElementById('callerDropdown').classList.toggle('open');
 }
 function selectCallerProfile(key){
-  const map={
-    public:'Public number',
-    customer:'Custom caller ID',
-    buy:'Buy phone number'
-  };
-  const label=map[key]||map.public;
-  document.getElementById('callerSelTxt').textContent=label;
-  document.getElementById('callerDropdown').classList.remove('open');
+  const dropdown=document.getElementById('callerDropdown');
+  const labelEl=document.getElementById('callerSelTxt');
   if(key==='buy'){
+    dropdown.classList.remove('open');
     openBuyNumberModal();
+    return;
   }
-  if(key==='customer'){
+  if(key==='custom'){
+    dropdown.classList.remove('open');
     openCustomCallerModal();
+    return;
   }
+  // Only simple profiles like "public" actually change the label
+  const map={public:'Public number'};
+  const label=map[key]||labelEl.textContent;
+  labelEl.textContent=label;
+  dropdown.classList.remove('open');
+}
+
+function selectVerifiedCaller(numberLabel){
+  document.getElementById('callerSelTxt').textContent=numberLabel;
+  document.getElementById('callerDropdown').classList.remove('open');
 }
 
 function openContactModal(){
